@@ -61,8 +61,7 @@ def fill_nan(input_data: xr.DataArray,
 
         * ffill: propagate last valid value forward (:py:func:`xarray.DataArray.ffill`)
         * bfill: propagate the next valid value backward (:py:func:`xarray.DataArray.bfill`)
-        * nearest, zero, slinear, quadratic, cubic, polynomial: interpolate gaps using given method
-        (:py:func:`xarray.DataArray.interpolate_na`)
+        * nearest, zero, slinear, quadratic, cubic, polynomial: interpolate gaps using given method (:py:func:`xarray.DataArray.interpolate_na`)
 
         The default is 'ffill'.
     return_mask: bool, optional
