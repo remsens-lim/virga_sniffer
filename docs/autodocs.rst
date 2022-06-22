@@ -14,3 +14,6 @@ virga_sniffer
    .. automodule:: virga_sniffer.utils
       :members:
 
+   .. automodule:: virga_sniffer.vsplot
+      :members:
+

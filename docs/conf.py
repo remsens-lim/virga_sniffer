@@ -39,11 +39,14 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.extlinks'
+    'sphinx.ext.extlinks',
 ]
+
 extlinks = {
     "doi": ("https://doi.org/%s", "doi:"),
 }
+
+
 intersphinx_mapping = {
     'python': ('https://docs.python.org/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable', None),

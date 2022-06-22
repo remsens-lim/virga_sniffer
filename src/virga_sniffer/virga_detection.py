@@ -9,6 +9,8 @@ from typing import Dict
 import xarray as xr
 import numpy as np
 
+from . import vsplot
+
 #: The recommended default configuration of virga-detection
 DEFAULT_CONFIG = dict(
     smooth_window_cbh=60,  # [s] smoothing of CBH
