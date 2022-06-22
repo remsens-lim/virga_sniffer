@@ -3,15 +3,15 @@ utils.py
 ===============
 Basic utility functions used for virga_detection.py
 """
-
-
 from typing import Iterable, Union
+from numpy.typing import NDArray
+
 import numpy as np
 from scipy.ndimage import median_filter
 import scipy.special
 
 
-def medfilt(input_data: np.ndarray, freq: float, window: float) -> np.ndarray:
+def medfilt(input_data: NDArray, freq: float, window: float) -> NDArray:
     """
     Apply scipy.ndimage.median_filter of a certain time window to the data
 
@@ -34,13 +34,31 @@ def medfilt(input_data: np.ndarray, freq: float, window: float) -> np.ndarray:
     # calculate window size
     window_size = int(np.round(freq * window, 0))
     # size have to be odd
-    if window_size % 2 == 0: window_size += 1
+    if window_size % 2 == 0:
+        window_size += 1
     # apply filter
     data_filtered = median_filter(input_data, size=window_size)
     return data_filtered
 
 
-def below_cloudbase(rgt, cbh, require_cbh=True):
+def below_cloudbase(rgt: NDArray, cbh: NDArray, require_cbh: bool = True) -> NDArray[bool]:
+    """
+    Checks if range-gate is below cloud base.
+
+    Parameters
+    ----------
+    rgt: numpy.ndarray(N)
+        range gate altitude [m]
+    cbh: numpy.ndarray(M,L)
+        cloud base height [m]
+    require_cbh: bool
+        If True, column requires `cbh` not nan in any layer. The default is True.
+
+    Returns
+    -------
+    np.ndarray(M,N)
+        Boolean Mask, True if below cbh.
+    """
     mask = np.full((cbh.shape[0], rgt.size), False)
     idxs = np.searchsorted(rgt, cbh)
 
@@ -49,12 +67,12 @@ def below_cloudbase(rgt, cbh, require_cbh=True):
     else:
         idxs[idxs == rgt.size] = -1
 
-    for l in range(idxs.shape[1]):
-        for i, idx in enumerate(idxs[:, l]):
-            if l == 0:
-                mask[i, slice(0, idx)] = True
+    for iranggate in range(idxs.shape[1]):
+        for itime, idx in enumerate(idxs[:, iranggate]):
+            if iranggate == 0:
+                mask[itime, slice(0, idx)] = True
             else:
-                mask[i, slice(np.max(idxs[i, :l]), idx)] = True
+                mask[itime, slice(np.max(idxs[itime, :iranggate]), idx)] = True
     return mask
 
 

@@ -12,8 +12,6 @@ import json
 from . import vsplot
 from . import layer_utils
 from . import utils
-from .cloud_base_height import process_cbh
-
 
 #: The recommended default configuration of virga-detection
 DEFAULT_CONFIG = dict(
@@ -40,8 +38,21 @@ DEFAULT_CONFIG = dict(
     cbh_ident_function=[1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4])  # order of operations applied to cbh: 0-clean, 1-split, 2-merge, 3-add-LCL, 4-smooth
 
 
-def check_input_config(input: xr.Dataset, config: dict) -> None:
-    input_vars = [v for v in input.variables]
+def check_input_config(input_data: xr.Dataset, config: dict) -> None:
+    """
+    Check input requirements of `virga_mask`
+
+    Parameters
+    ----------
+    input_data: xarray.Dataset
+    config: dict
+
+    Returns
+    -------
+    None
+
+    """
+    input_vars = [v for v in input_data.variables]
     if "ze" not in input_vars:
         raise Exception("input missing 'ze' variable.")
     if "cbh" not in input_vars:
@@ -103,9 +114,9 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     # unify coordinates naming in input
     input_coords = list(input_data.Ze.coords.keys())[:2]
     input_coords.append(list(input_data.cloud_base_height.coords.keys())[1])
-    rename_map = {input_coords[0]:'time',
-                  input_coords[1]:'range',
-                  input_coords[2]:'layer'}
+    rename_map = {input_coords[0]: 'time',
+                  input_coords[1]: 'range',
+                  input_coords[2]: 'layer'}
     ds = input_data.rename(rename_map)
 
     # check input
@@ -119,13 +130,13 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     rgbase = rgmid - rgedge[:-1]
 
     # preprocess cbh data
-    cbh = process_cbh(ds.cloud_base_height, config=config)
+    cbh, idx_lcl, idx_fill = layer_utils.process_cbh(ds, config=config)
 
     # Assign/ Initialize variables to work with
-    cth = cbh.copy()*np.nan # cloud-top height
+    cth = cbh.copy()*np.nan  # cloud-top height
     # initialize masks if with valid radar signal
-    vmask = ~np.isnan(ds.Ze.values) # flag_virga (True if Virga)
-    cmask = vmask.copy() # flag_cloud (True if cloud)
+    vmask = ~np.isnan(ds.Ze.values)  # flag_virga (True if Virga)
+    cmask = vmask.copy()  # flag_cloud (True if cloud)
 
     # --------------------------------------
     # Apply  Virga-Sniffer on total profiles
@@ -166,9 +177,9 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         # but small gaps in original mask are filled with True
         mask_tmp = mask_tmp.fillna(False).values[:, 1:].astype(bool)
         # loop all timesteps i and cbh-layer l
-        for i in range(idxs.shape[0]):
-            for l in range(idxs.shape[1]):
-                # identify index of cbh layer in radar singal
+        for itime in range(idxs.shape[0]):
+            for ilayer in range(idxs.shape[1]):
+                # identify index of cbh layer in radar signal
                 # handling of nan values in cbh layer:
                 #  * if nan choose the next higher or lower layer
                 #  * lower cbh layer defaults to lowest range-gate
@@ -176,31 +187,31 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                 # here we can use max and min functions as we set nan values to
                 # * -1 in idxs
                 # * vmask.shape[1]-1 in idxs_top
-                ilow = np.max([np.max(idxs[i, :l + 1]), 0])
-                if l == idxs.shape[1] - 1:
+                ilow = np.max([np.max(idxs[itime, :ilayer + 1]), 0])
+                if ilayer == idxs.shape[1] - 1:
                     itop = vmask.shape[1] - 1
                 else:
-                    itop = np.min(idxs_top[i, l + 1:])
+                    itop = np.min(idxs_top[itime, ilayer + 1:])
                 # just look at this part of the mask:
                 # time i and between cbh layers
-                mask_l = mask_tmp[i, ilow:itop]
+                mask_l = mask_tmp[itime, ilow:itop]
                 if not np.all(mask_l):
                     # signal has a gap larger then layer_threshold
                     # consider everything below the first gap as cloud (no-virga)
                     gapidx = np.argwhere(~mask_l)
                     if gapidx.shape[0] > 0:
                         mask_l[:gapidx.ravel()[0]] = False
-                        if l != 0:
-                            cth.values[i, l - 1] = rgtop[ilow + gapidx.ravel()[0]]
+                        if ilayer != 0:
+                            cth.values[itime, ilayer - 1] = rgtop[ilow + gapidx.ravel()[0]]
                     # update original mask
-                    vmask[i, ilow:itop] *= mask_l
-                elif l == 0:
+                    vmask[itime, ilow:itop] *= mask_l
+                elif ilayer == 0:
                     # do nothing if we look at virtual added lowest layer
                     pass
                 else:
                     # signal connects through cloud bases, so remove below cbh
                     # avoid added virtual cbh layer at lowest rangegate
-                    cbh.values[i, l - 1] = np.nan
+                    cbh.values[itime, ilayer - 1] = np.nan
 
     cth = cth.where(~np.isnan(cbh))
     # can use additional smoothing
@@ -238,15 +249,13 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     # assign layered masks for layer depended masking
     vmask_layer = np.full((*vmask.shape, cbh.layer.size), False)
     cmask_layer = np.full((*vmask.shape, cbh.layer.size), False)
-    for i in range(vmask.shape[0]):
+    for itime in range(vmask.shape[0]):
         ilowercloudtop = 0
-        for l in range(cbh.shape[1]):
-            icloudbase = idxs_cbh[i, l]
-            icloudtop = idxs_cth[i, l]
-            icloudbase = idxs_cbh[i, l]
-            icloudtop = idxs_cth[i, l]
-            cmask_layer[i, icloudbase:icloudtop, l] = cmask[i, icloudbase:icloudtop]
-            vmask_layer[i, ilowercloudtop:icloudbase, l] = vmask[i, ilowercloudtop:icloudbase]
+        for ilayer in range(cbh.shape[1]):
+            icloudbase = idxs_cbh[itime, ilayer]
+            icloudtop = idxs_cth[itime, ilayer]
+            cmask_layer[itime, icloudbase:icloudtop, ilayer] = cmask[itime, icloudbase:icloudtop]
+            vmask_layer[itime, ilowercloudtop:icloudbase, ilayer] = vmask[itime, ilowercloudtop:icloudbase]
             # update cloudtop from lower level
             ilowercloudtop = icloudtop
 
@@ -254,7 +263,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         # Use ancillary rain sensor data to remove detected virga if rain
         # is observed at surface.
         # Apply only to lowest range-gate
-        vmask_layer[:,:,0] *= _expand_mask(~ds.flag_surface_rain.values, vmask.shape[1])  # True if no rain at sfc
+        vmask_layer[:, :, 0] *= _expand_mask(~ds.flag_surface_rain.values, vmask.shape[1])  # True if no rain at sfc
 
     if config['mask_zet']:
         # Check if Signal of first range gate is below threshold.
@@ -262,17 +271,17 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         # Apply only to lowest range-gate
         ze_threshold = ds.Ze.values[:, 0] < config['ze_thres']
         ze_threshold += np.isnan(ds.Ze.values[:, 0])  # add nans again
-        vmask_layer[:,:,0] *= _expand_mask(ze_threshold, vmask.shape[1])
+        vmask_layer[:, :, 0] *= _expand_mask(ze_threshold, vmask.shape[1])
 
     if config['mask_minrg']:
         # Remove from Virga mask if column number of range-gates
         # with a signal is lower than mask_minrg
         # At this stage whole column is checked a once.
         # Apply virga from different layer separately
-        for l in range(vmask_layer.shape[1]):
-            c = np.count_nonzero(vmask_layer[:,:,l], axis=1)
+        for ilayer in range(vmask_layer.shape[1]):
+            c = np.count_nonzero(vmask_layer[:, :, ilayer], axis=1)
             minrg_mask = c > config['mask_minrg']
-            vmask_layer[:,:,l] *= _expand_mask(minrg_mask, vmask.shape[1])
+            vmask_layer[:, :, ilayer] *= _expand_mask(minrg_mask, vmask.shape[1])
 
     # Merge layered masks again
     vmask = np.sum(vmask_layer, axis=-1).astype(bool)
@@ -288,19 +297,19 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     idxs_vbh = np.full(cbh.shape, -1)
     vth = np.full(cbh.shape, np.nan)
     vbh = np.full(cbh.shape, np.nan)
-    for i in range(vmask.shape[0]):
-        for l in range(cbh.shape[1]):
+    for itime in range(vmask.shape[0]):
+        for ilayer in range(cbh.shape[1]):
             # get idx where virga is True in a layer
-            ivirga = np.argwhere(vmask_layer[i, :, l]).flatten()
+            ivirga = np.argwhere(vmask_layer[itime, :, ilayer]).flatten()
             if len(ivirga) != 0:
                 ivirgabase = np.min(ivirga)
                 ivirgatop = np.max(ivirga)
-                idxs_vbh[i, l] = ivirgabase
-                idxs_vth[i, l] = ivirgatop
-                vth[i, l] = rgtop[ivirgatop]
-                vbh[i, l] = rgbase[ivirgabase]
-                virga_depth_rgmid[i, l] = rgmid[ivirgatop] - rgmid[ivirgabase]
-                virga_depth_rgedge[i, l] = rgtop[ivirgatop] - rgbase[ivirgabase]
+                idxs_vbh[itime, ilayer] = ivirgabase
+                idxs_vth[itime, ilayer] = ivirgatop
+                vth[itime, ilayer] = rgtop[ivirgatop]
+                vbh[itime, ilayer] = rgbase[ivirgabase]
+                virga_depth_rgmid[itime, ilayer] = rgmid[ivirgatop] - rgmid[ivirgabase]
+                virga_depth_rgedge[itime, ilayer] = rgtop[ivirgatop] - rgbase[ivirgabase]
 
     output_dataset = xr.Dataset({"flag_virga": (('time', 'range'), vmask),
                                  "flag_virga_layer": (('time', 'range', 'layer'), vmask_layer),
