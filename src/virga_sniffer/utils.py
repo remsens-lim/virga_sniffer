@@ -7,8 +7,8 @@ Basic utility functions used for virga_detection.py
 
 from typing import Iterable, Union
 import numpy as np
-import xarray as xr
 from scipy.ndimage import median_filter
+import scipy.special
 
 
 def medfilt(input_data: np.ndarray, freq: float, window: float) -> np.ndarray:
@@ -40,9 +40,6 @@ def medfilt(input_data: np.ndarray, freq: float, window: float) -> np.ndarray:
     return data_filtered
 
 
-
-
-
 def below_cloudbase(rgt, cbh, require_cbh=True):
     mask = np.full((cbh.shape[0], rgt.size), False)
     idxs = np.searchsorted(rgt, cbh)
@@ -59,6 +56,7 @@ def below_cloudbase(rgt, cbh, require_cbh=True):
             else:
                 mask[i, slice(np.max(idxs[i, :l]), idx)] = True
     return mask
+
 
 def calc_lcl(p: Union[float, Iterable[float]],
              T: Union[float, Iterable[float]],
@@ -104,9 +102,6 @@ def calc_lcl(p: Union[float, Iterable[float]],
 
         Same shape as `p`.
     """
-
-    import numpy as np
-    import scipy.special
 
     # Parameters
     Ttrip = 273.16  # K
@@ -172,6 +167,8 @@ def calc_lcl(p: Union[float, Iterable[float]],
         rh = np.ones(len(T)) * np.nan
         rh[Ctrip] = rhl[Ctrip]
         rh[~Ctrip] = rhs[~Ctrip]
+    else:
+        raise Exception("At least one of rh, rhl or rhs must be not None")
 
     # Calculate lcl_liquid and lcl_solid
     qv = rgasa * pv / (rgasv * p + (rgasa - rgasv) * pv)

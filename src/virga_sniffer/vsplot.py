@@ -5,8 +5,6 @@ Methods for plotting Virga-Sniffer output, in the form of xarray dataset accesso
 
 """
 
-
-
 import xarray as xr
 import numpy as np
 import pandas as pd
