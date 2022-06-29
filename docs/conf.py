@@ -43,7 +43,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.extlinks',
-    'jupyter_sphinx',
 ]
 
 extlinks = {
@@ -66,23 +65,6 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
 
-
-jupyter_sphinx_thebelab_config = {
-    'requestKernel': True,
-    'mountActivateWidget': True,
-    'mountStatusWidget': True,
-    'binderOptions': {
-        'repo': "jonas-witthuhn/test-requirements",
-        'repoProvider': "github",
-    },
-    "codeMirrorConfig": {
-        "readOnly": True,
-    },
-    "kernelOptions": {
-        # "kernelName": "snifferdev",
-        "path": os.path.abspath('../example/'),
-    },
-}
 
 
 napoleon_type_aliases = {

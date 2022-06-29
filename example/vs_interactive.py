@@ -3,6 +3,7 @@ sys.path.append('../src/')
 import os
 import json
 import numpy as np
+import pandas as pd
 import xarray as xr
 import matplotlib.pyplot as plt
 import ipywidgets as widgets
@@ -19,7 +20,7 @@ def vmask_interact(input_file,
                    smooth_window_cbh,
                    smooth_window_lcl,
                    require_cbh,
-                   mask_below_cbh,
+                   # mask_below_cbh,
                    mask_ze_threshold,
                    ze_threshold,
                    mask_rain,
@@ -33,7 +34,7 @@ def vmask_interact(input_file,
                    clean_threshold,
                    layer_threshold,
                    cbh_layer_fill,
-                   virga_max_gap,
+                   ze_max_gap,
                    cbh_fill_method,
                    layer_fill_limit,
                    cbh_ident_function):
@@ -54,7 +55,7 @@ def vmask_interact(input_file,
     config = dict(smooth_window_cbh=smooth_window_cbh,
                   smooth_window_lcl=smooth_window_lcl,
                   require_cbh=require_cbh,
-                  mask_below_cbh=mask_below_cbh,
+                  # mask_below_cbh=mask_below_cbh,
                   mask_zet=mask_ze_threshold,
                   ze_thres=ze_threshold,
                   mask_rain=mask_rain,
@@ -69,12 +70,34 @@ def vmask_interact(input_file,
                   clean_threshold=clean_threshold/100.,
                   layer_threshold=layer_threshold,
                   cbh_layer_fill=cbh_layer_fill,
-                  virga_max_gap=virga_max_gap,
+                  virga_max_gap=ze_max_gap,
                   cbh_fill_method=cbh_fill_method,
                   layer_fill_limit=layer_fill_limit)
     vsout = vm(input_data, config=config)
 
     fig,axs = vsout.vsplot.quicklook_full(ylim=ymax)
+
+    colors = [
+        "k",
+        '#e41a1c',
+        '#ff7f00',
+        '#ffff33',
+        '#377eb8',
+        '#a65628',
+    ]
+    fig = plt.figure(figsize=(15,5))
+    ax = fig.add_subplot(111)
+    tim = pd.to_datetime(vsout.time.values)
+    for ilayer in vsout.layer.values:
+        ax.plot(tim, vsout.sel(layer=ilayer).virga_depth,
+                color=colors[ilayer])
+    fig = plt.figure(figsize=(15,5))
+    ax = fig.add_subplot(111)
+    tim = pd.to_datetime(vsout.time.values)
+    for ilayer in vsout.layer.values:
+        ax.plot(tim, vsout.sel(layer=ilayer).virga_depth_maximum_extend,
+                color=colors[ilayer])
+
     return 0
 
 def vsinteractive():
@@ -93,7 +116,7 @@ def vsinteractive():
     smooth_window_lcl = widgets.IntSlider(min=0, max=600, step=60,
                                           value=default_config['smooth_window_lcl'],
                                           continuous_update=False)
-    mask_below_cbh = widgets.Checkbox(value=default_config['mask_below_cbh'], indent=False)
+    # mask_below_cbh = widgets.Checkbox(value=default_config['mask_below_cbh'], indent=False)
     require_cbh = widgets.Checkbox(value=default_config['require_cbh'], indent=False)
     mask_rain = widgets.Checkbox(value=default_config['mask_rain'], indent=False)
     mask_zet = widgets.Checkbox(value=default_config['mask_zet'], indent=False)
@@ -117,8 +140,8 @@ def vsinteractive():
     layer_threshold = widgets.IntSlider(min=0, max=1000, step=100,
                                         value=default_config['layer_threshold'],
                                         continuous_update=False)
-    virga_max_gap = widgets.IntSlider(min=0, max=500, step=50,
-                                      value=default_config['virga_max_gap'],
+    ze_max_gap = widgets.IntSlider(min=0, max=500, step=50,
+                                      value=default_config['ze_max_gap'],
                                       continuous_update=False)
     clean_threshold = widgets.IntSlider(min=0, max=100, step=1,
                                         value=int(100*default_config['clean_threshold']),
@@ -153,13 +176,13 @@ def vsinteractive():
         # widgets.HBox([Label("Merge LCL:"),merge_LCL]),
         widgets.HBox([Label("LCL smooth window [s]:"),smooth_window_lcl]),
         Label("Virga Mask: -----------------------------------------------------------"),
-        widgets.HBox([Label("Mask below CBH:"),mask_below_cbh]),#Label('Restrict Virga below CBH layer, 0=off')
+        # widgets.HBox([Label("Mask below CBH:"),mask_below_cbh]),#Label('Restrict Virga below CBH layer, 0=off')
         widgets.HBox([Label("Require CBH          :"),require_cbh]),#Label('Detection of Virga requires CBH value in column')
         widgets.HBox([Label("Rain Mask (Ze) [dBz] :"),  ze_thres,mask_zet]),#Label("No Virga if Ze of lowest range-gate is above threshold [dBz]")
         widgets.HBox([Label("Rain Mask (DWD)      :"),mask_rain]),#, Label("If DWD detects Rain => no virga")
         widgets.HBox([Label("Doppler Velocity Mask [ms-1]:"),vel_thres,mask_vel]),#Label("Virga, if Dopplervelocity below threshold [m s-1]"
-        widgets.HBox([Label("Connection to CBH req:"), mask_connect]),#Label("Requires this number of range-gates connected to CBH to be counted as virga."
-        widgets.HBox([Label("Virga max gap [m]:"),virga_max_gap]),
+        widgets.HBox([Label("Mask Virga gaps (based on ze max gap)"), mask_connect]),#Label("Requires this number of range-gates connected to CBH to be counted as virga."
+        widgets.HBox([Label("Ze max gap [m]:"), ze_max_gap]),
         widgets.HBox([Label("Number of RG required:"), mask_minrg]),#Label("Requires this number of virga range-gates to be counted as virga."
         widgets.HBox([Label("Masking Ze+Vel relation:"),clutter_m,clutter_c, mask_clutter]),
         Label("Data chooser: ----------------------------------------------------------"),
@@ -172,7 +195,7 @@ def vsinteractive():
                                           smooth_window_cbh=smooth_window_cbh,
                                           smooth_window_lcl=smooth_window_lcl,
                                           require_cbh=require_cbh,
-                                          mask_below_cbh=mask_below_cbh,
+                                          # mask_below_cbh=mask_below_cbh,
                                           mask_ze_threshold=mask_zet,
                                           ze_threshold=ze_thres,
                                           mask_rain=mask_rain,
@@ -185,7 +208,7 @@ def vsinteractive():
                                           clutter_m=clutter_m,
                                           clutter_c=clutter_c,
                                           cbh_layer_fill=cbh_layer_fill,
-                                          virga_max_gap=virga_max_gap,
+                                          ze_max_gap=ze_max_gap,
                                           cbh_fill_method=cbh_fill_method,
                                           cbh_ident_function=cbh_ident_function,
                                           clean_threshold=clean_threshold,

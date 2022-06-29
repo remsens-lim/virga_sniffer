@@ -1,7 +1,44 @@
 # Changelog
+
+# Version 0.3.4
+
+* masking rain by *flag_surface_rain* or lowest range gate reflectivity is now applied only to lowest cloud layer
+* quicklook and plotting routines are accessible as xarray Dataset accessor via 
+  ```{python}
+  import virga_sniffer
+  output_dataset = virga_sniffer.virga_mask(input_dataset, config)
+  output_dataset.vsplot.quicklook_full()
+  ```
+* rename output dataset:
+    * CBH : cloud_base_height
+    * CTH : cloud_top_height
+* new/adjusted variables:
+    * flag_virga_layer - like flag_virga but separated for each cloud layer
+    * flag_cloud - flags range gates between cloud bases and tops
+    * flag_cloud_layer - like flag_virga_layer but for clouds
+    * virga_depth
+      * **calculated from lower edge of lowest range gate  with virga to upper edge of top range gate with virga**
+      * **virga_depth now excludes range gates where radar reflectivity is nan or 0**
+    * virga_depth_maximum_extend - like virga_depth, but including gaps (maximum geometric extend)
+    * virga_top_height
+    * virga_base_height
+    * cloud_top_rg - index of rangegate where cloud top is located
+    * cloud_base_rg  - index of rangegate where cloud base is located
+    * virga_top_rg - index of rangegate where virga top is located
+    * virga_base_rg  - index of rangegate where virga base is located
+* new example
+  * Added interactive demonstration of virga_sniffer config as jupyter notebook
+* Changes in default configuration
+  * ```require_cbh=True```: need a cloud base to be considered as virga?
+  * ```mask_below_cbh=True -> removed```: virga is always below cloud base
+  * ```mask_connect=True -> ignore_virga_gaps=True```: the behaviour has changed and the flag is now used to switch between ignore gaps for virga mask or not
+  * ```virga_max_gap=150 -> ze_max_gap=150```: [m] maximum gap between radar reflectivity values to count as connected virga or cloud.
+  * ```cbh_layer_fill=True```: fill gaps of cbh layer?
+  * ```layer_fill_limit=60```: [s] fill gaps of cbh layer with this gap limit (changed units from min to s)
+
 ---
 
-# Version 3
+# Version 3 (0.3.3)
 From version 2 to version 3 the Virga-Sniffer receives a general overhaul, which basically reworks everything from the base version 0.2.0 and adds more functionality like flexible input data, multi-cloud-layer handling, etc.. Updates and General workflow with indication of changes will be summarized below. Explanation of functions, thresholds, etc. will be given in the documentation.
 
 ## Virga Sniffer v3 workflow

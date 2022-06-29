@@ -41,55 +41,6 @@ def medfilt(input_data: NDArray, freq: float, window: float) -> NDArray:
     return data_filtered
 
 
-def below_cloudbase(rgt: NDArray, cbh: NDArray, require_cbh: bool = True) -> NDArray[bool]:
-    """
-    Checks if range-gate is below cloud base.
-
-    Parameters
-    ----------
-    rgt: numpy.ndarray(N)
-        range gate altitude [m]
-    cbh: numpy.ndarray(M,L)
-        cloud base height [m]
-    require_cbh: bool
-        If True, column requires `cbh` not nan in any layer. The default is True.
-
-    Returns
-    -------
-    np.ndarray(M,N)
-        Boolean Mask, True if below cbh.
-    """
-    mask = np.full((cbh.shape[0], rgt.size), False)
-    idxs = np.searchsorted(rgt, cbh)
-
-    if require_cbh:
-        idxs[idxs == rgt.size] = 0
-    else:
-        idxs[idxs == rgt.size] = -1
-
-    for iranggate in range(idxs.shape[1]):
-        for itime, idx in enumerate(idxs[:, iranggate]):
-            if iranggate == 0:
-                mask[itime, slice(0, idx)] = True
-            else:
-                mask[itime, slice(np.max(idxs[itime, :iranggate]), idx)] = True
-    return mask
-
-
-# def below_cloudbase(idxs: NDArray[int], nrangegates: int) -> NDArray[bool]:
-#     shape = (idxs.shape[0], nrangegates)
-#     mask = np.full(shape, False)
-#     for ilayer in range(idxs.shape[1]):
-#         for itime, idx in enumerate(idxs[:, ilayer]):
-#             if ilayer == 0:
-#                 mask[itime, slice(0, idx)] = True
-#             else:
-#                 mask[itime, slice(np.max(idxs[itime, :iranggate]), idx)] = True
-#     return mask
-# def require_cloudbase():
-#     return
-
-
 def calc_lcl(p: Union[float, Iterable[float]],
              T: Union[float, Iterable[float]],
              rh:  Union[None, float, Iterable[float]] = None,

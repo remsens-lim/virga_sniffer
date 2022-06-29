@@ -2,14 +2,14 @@
 # Documentation
 sphinx>=5.0.2
 myst-parser
-jupyter_sphinx
-ipympl>=0.9.1
 
 # Example
 jupyter
 jupyterlab
 ipywidgets
+ipympl>=0.9.1
 
+# main
 xarray>=2022.3.0
 netcdf4>=1.5.8
 bottleneck

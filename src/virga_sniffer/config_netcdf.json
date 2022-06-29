@@ -53,12 +53,14 @@
   },
   "virga_depth": {
     "long_name": "virga depth (virga top - virga base)",
+    "note": "This value excludes range-gates where radar reflectivity is zero or nan. It is calculated by sum(rangegates_with_virga_top - rangegates_with_virga_base)",
     "units": "m"
   },
-  "virga_depth_rgmid": {
+  "virga_depth_maximum_extend": {
     "long_name": "virga depth (virga top - virga base)",
-    "note": "calculated from virga top range gate mid - virga base range gate mid, instead of edges",
-    "units": "m"},
+    "note": "This value includes range-gates where radar reflectivity is zero or nan. Therefore, this is a measure of geometric maximum depth of virga. For volumetric statistics it is advisable to use virga_depth (excluding empty radar range-gates).",
+    "units": "m"
+  },
   "flag_lcl_filled": {
     "note": "True if lowest CBH is filled with calculated lifting-condensation-level"
   },
