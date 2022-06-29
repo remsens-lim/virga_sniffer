@@ -7,8 +7,11 @@ Layer DataArrays are 2-D arrays of usually of dims (time,layer).
 The time dimension coordinate data is often required in numpy.datetime64 format,
 whereas layer dimension data is not required. The naming of the dimensions is irrelevant.
 """
+
 from typing import Optional, Union, Tuple, Any
 
+import os
+import json
 from numpy import ndarray
 from numpy.typing import NDArray
 import numpy as np
@@ -16,32 +19,31 @@ import xarray as xr
 from xarray import DataArray
 
 from . import utils
-from .virga_detection import DEFAULT_CONFIG
 
-
-def process_cbh(input_data: xr.Dataset, config: dict = None) -> Tuple[Union[DataArray, Any], ndarray, Union[ndarray, Any]]:
+def process_cbh(input_data: xr.Dataset,
+                config: dict = {}) -> Tuple[Union[DataArray, Any], ndarray, Union[ndarray, Any]]:
     """
-    Cloud base height layer data preprocessing to split, merge, fill, sort
-     and smooth the data for use in the virga sniffer.
+    Cloud base height layer data preprocessing to split, merge, fill, sort and smooth the data for use in the virga sniffer.
+
     Parameters
     ----------
     input_data: xarray.Dataset
-        Input data including at least:
+        The input dataset with dimensions ('time','range','layer' (actual dimension-names doesn't matter)).
 
         Variables:
 
         * **cloud_base_height**: ('time', 'layer') - cloud base height [m]
-        * **lcl**: ('time') [optional] - lifting condensation level [m]
-         (required if config['cbh_ident_function'] includes a 3 for merging lcl)
+        * **lcl**: ('time') [optional] - lifting condensation level [m] (required if config['cbh_ident_function'] includes a 3 for merging lcl)
 
         Coords:
 
         * **time** ('time') - datetime [UTC]
         * **layer** ('layer') - counting **cbh** layer (np.arange(cbh.shape[1])) [-]
 
-   config: dict, optional
+    config: dict, optional
         The configuration flags and thresholds.
         Will be merged with the default configuration, see :ref:`02_setup.md#configuration`.
+
 
     Returns
     -------
@@ -50,12 +52,22 @@ def process_cbh(input_data: xr.Dataset, config: dict = None) -> Tuple[Union[Data
     numpy.ndarray
         Flag where LCL was merged into CBH at layer 0
     numpy.ndarray
-        Flag where CBH layer data was filled by interpolation method config["cbh_fill_method"]
+        Flag where CBH layer data was filled by interpolation method config['cbh_fill_method']
+
     """
+
+    # read default config
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, "config_vsdefault.json")
+    with open(filename) as json_file:
+        default_config = json.load(json_file)
+
+    # merge user config with default config
     if config is None:
-        config = DEFAULT_CONFIG.copy()
+        config = default_config.copy()
     else:
-        config = {**DEFAULT_CONFIG, **config}
+        config = {**default_config, **config}
+
 
     cbh = input_data.cloud_base_height
     cbh = smooth(cbh, window=config['smooth_window_cbh'])
@@ -66,7 +78,6 @@ def process_cbh(input_data: xr.Dataset, config: dict = None) -> Tuple[Union[Data
         # lcl included so smooth it
         lcl = input_data.lcl
         lcl = smooth(lcl, window=config['smooth_window_lcl'])
-        lcl = lcl.interp_like(cbh).expand_dims('layer', axis=1)
 
     # CBH Layer identification, splitting and merging, filling
     for cbhpro in config['cbh_ident_function']:  # [1,0,2,0,3,1,0,2,0,3,4]
@@ -86,7 +97,8 @@ def process_cbh(input_data: xr.Dataset, config: dict = None) -> Tuple[Union[Data
 
         elif cbhpro == 3:
             # add lcl
-            cbh, idx_lcl_tmp = replace_nan(cbh, layer=0, return_mask=True)
+            cbh, idx_lcl_tmp = replace_nan(cbh, input_layer=lcl,
+                                           layer=0, return_mask=True)
             idx_lcl += idx_lcl_tmp
 
         elif cbhpro == 4:

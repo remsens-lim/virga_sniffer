@@ -1,0 +1,23 @@
+{
+    "smooth_window_cbh": 60,
+    "smooth_window_lcl": 300,
+    "mask_below_cbh": true,
+    "require_cbh": true,
+    "mask_rain": true,
+    "mask_zet": true,
+    "ze_thres": 0,
+    "mask_connect": true,
+    "mask_minrg": 2,
+    "mask_vel": true,
+    "vel_thres": 0,
+    "mask_clutter": true,
+    "clutter_c": -8,
+    "clutter_m": 4,
+    "layer_threshold": 500,
+    "virga_max_gap": 150,
+    "clean_threshold": 0.05,
+    "cbh_layer_fill": true,
+    "cbh_fill_method": "slinear",
+    "layer_fill_limit": 60,
+    "cbh_ident_function": [1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4]
+}

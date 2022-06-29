@@ -9,33 +9,34 @@ import xarray as xr
 import numpy as np
 import json
 
-from . import vsplot
+
 from . import layer_utils
 from . import utils
+from . import vsplot
 
-#: The recommended default configuration of virga-detection
-DEFAULT_CONFIG = dict(
-    smooth_window_cbh=60,  # [s] smoothing of CBH
-    smooth_window_lcl=300,  # [s] smoothing of LCL if provided
-    require_cbh=True,  # need a cloud base to be considered as virga?
-    mask_below_cbh=True,  # vira if below cbh?
-    mask_rain=True,  # apply rain mask from ancillary data?
-    mask_zet=True,  # apply rain mask from radar signal?
-    ze_thres=0,  # [dBz] minimum Radar signal at lowest range-gate which is considered rain
-    mask_connect=True,  # apply virga mask cleaning regarding cbh layers
-    mask_minrg=2,  # minimum number of range-gates in column to be considered virga
-    mask_vel=True,  # apply velocity mask ?
-    vel_thres=0,  # [ms-1] velocity threshold
-    mask_clutter=True,  # apply clutter threshold line ?
-    clutter_c=-8,  # [ms-1] intercept of clutter threshold line
-    clutter_m=4,  # [ms-1 dBz-1] slope of clutter threshold line
-    layer_threshold=500,  # [m] cbh layer separation
-    virga_max_gap=150,  # [m] maximum gap between virga signal to count as connected virga and for clouds to cloud base
-    clean_threshold=0.05,  # [0-1] remove cbh layer if below (clean_treshold*100)% of total data
-    cbh_layer_fill=True,  # fill gaps of cbh layer?
-    cbh_fill_method='slinear',  # fill method of cbh layer gaps
-    layer_fill_limit=1,  # [min] fill gaps of cbh layer with this gap limit
-    cbh_ident_function=[1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4])  # order of operations applied to cbh: 0-clean, 1-split, 2-merge, 3-add-LCL, 4-smooth
+# The recommended default configuration of virga-detection
+# DEFAULT_CONFIG = dict(
+#     smooth_window_cbh=60,  # [s] smoothing of CBH
+#     smooth_window_lcl=300,  # [s] smoothing of LCL if provided
+#     require_cbh=True,  # need a cloud base to be considered as virga?
+#     mask_below_cbh=True,  # vira if below cbh?
+#     mask_rain=True,  # apply rain mask from ancillary data?
+#     mask_zet=True,  # apply rain mask from radar signal?
+#     ze_thres=0,  # [dBz] minimum Radar signal at lowest range-gate which is considered rain
+#     mask_connect=True,  # apply virga mask cleaning regarding cbh layers
+#     mask_minrg=2,  # minimum number of range-gates in column to be considered virga
+#     mask_vel=True,  # apply velocity mask ?
+#     vel_thres=0,  # [ms-1] velocity threshold
+#     mask_clutter=True,  # apply clutter threshold line ?
+#     clutter_c=-8,  # [ms-1] intercept of clutter threshold line
+#     clutter_m=4,  # [ms-1 dBz-1] slope of clutter threshold line
+#     layer_threshold=500,  # [m] cbh layer separation
+#     virga_max_gap=150,  # [m] maximum gap between virga signal to count as connected virga and for clouds to cloud base
+#     clean_threshold=0.05,  # [0-1] remove cbh layer if below (clean_treshold*100)% of total data
+#     cbh_layer_fill=True,  # fill gaps of cbh layer?
+#     cbh_fill_method='slinear',  # fill method of cbh layer gaps
+#     layer_fill_limit=60,  # [s] fill gaps of cbh layer with this gap limit
+#     cbh_ident_function=[1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4])  # order of operations applied to cbh: 0-clean, 1-split, 2-merge, 3-add-LCL, 4-smooth
 
 
 def check_input_config(input_data: xr.Dataset, config: dict) -> None:
@@ -53,10 +54,10 @@ def check_input_config(input_data: xr.Dataset, config: dict) -> None:
 
     """
     input_vars = [v for v in input_data.variables]
-    if "ze" not in input_vars:
-        raise Exception("input missing 'ze' variable.")
-    if "cbh" not in input_vars:
-        raise Exception("input missing 'cbh' variable.")
+    if "Ze" not in input_vars:
+        raise Exception("input missing 'Ze' variable.")
+    if "cloud_base_height" not in input_vars:
+        raise Exception("input missing 'cloud_base_height' variable.")
     if config['mask_rain'] and ("flag_surface_rain" not in input_vars):
         raise Exception("config['mask_rain']==True while input['flag_surface_rain'] is missing.")
     if config['mask_vel'] and ("vel" not in input_vars):
@@ -105,11 +106,17 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         """
         return np.repeat(data[:, np.newaxis], size, axis=1)
 
+    # read default config
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, "config_vsdefault.json")
+    with open(filename) as json_file:
+        default_config = json.load(json_file)
+
     # merge user config with default config
     if config is None:
-        config = DEFAULT_CONFIG.copy()
+        config = default_config.copy()
     else:
-        config = {**DEFAULT_CONFIG, **config}
+        config = {**default_config, **config}
 
     # unify coordinates naming in input
     input_coords = list(input_data.Ze.coords.keys())[:2]
@@ -133,7 +140,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     cbh, idx_lcl, idx_fill = layer_utils.process_cbh(ds, config=config)
 
     # Assign/ Initialize variables to work with
-    cth = cbh.copy()*np.nan  # cloud-top height
+    cth = cbh.copy() * np.nan  # cloud-top height
     # initialize masks if with valid radar signal
     vmask = ~np.isnan(ds.Ze.values)  # flag_virga (True if Virga)
     cmask = vmask.copy()  # flag_cloud (True if cloud)
@@ -254,6 +261,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         for ilayer in range(cbh.shape[1]):
             icloudbase = idxs_cbh[itime, ilayer]
             icloudtop = idxs_cth[itime, ilayer]
+            # if not ((config['require_cbh']) and (icloudbase == -1)):
             cmask_layer[itime, icloudbase:icloudtop, ilayer] = cmask[itime, icloudbase:icloudtop]
             vmask_layer[itime, ilowercloudtop:icloudbase, ilayer] = vmask[itime, ilowercloudtop:icloudbase]
             # update cloudtop from lower level
@@ -278,7 +286,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         # with a signal is lower than mask_minrg
         # At this stage whole column is checked a once.
         # Apply virga from different layer separately
-        for ilayer in range(vmask_layer.shape[1]):
+        for ilayer in range(vmask_layer.shape[2]):
             c = np.count_nonzero(vmask_layer[:, :, ilayer], axis=1)
             minrg_mask = c > config['mask_minrg']
             vmask_layer[:, :, ilayer] *= _expand_mask(minrg_mask, vmask.shape[1])
@@ -335,8 +343,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                                         'range_base': ('range', rgbase)})
 
     # assign metadata
-    dirname = os.path.dirname(__file__)
-    filename = os.path.join(dirname, "nc-config.json")
+    filename = os.path.join(dirname, "config_netcdf.json")
     with open(filename) as json_file:
         nc_meta = json.load(json_file)
 
@@ -344,3 +351,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         output_dataset[var].attrs.update(nc_meta[var])
 
     return output_dataset
+
+
+if __name__ == '__main__':
+    print(DEFAULT_CONFIG)

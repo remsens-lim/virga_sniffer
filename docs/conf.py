@@ -13,7 +13,10 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../src/'))
-
+# sys.path.insert(0, os.path.abspath('../example/'))
+# package_path = os.path.abspath('../..')
+os.environ['PYTHONPATH'] = ':'.join((os.path.abspath('../example/'),
+                                     os.environ.get('PYTHONPATH', '')))
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +25,7 @@ copyright = '2022, Jonas Witthuhn, Johannes Röttenbacher, Heike Kalesse-Los'
 author = 'Jonas Witthuhn, Johannes Röttenbacher, Heike Kalesse-Los'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.3.3'
+release = 'v0.3.4'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,6 +43,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.extlinks',
+    'jupyter_sphinx',
 ]
 
 extlinks = {
@@ -61,6 +65,25 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
+
+
+jupyter_sphinx_thebelab_config = {
+    'requestKernel': True,
+    'mountActivateWidget': True,
+    'mountStatusWidget': True,
+    'binderOptions': {
+        'repo': "jonas-witthuhn/test-requirements",
+        'repoProvider': "github",
+    },
+    "codeMirrorConfig": {
+        "readOnly": True,
+    },
+    "kernelOptions": {
+        # "kernelName": "snifferdev",
+        "path": os.path.abspath('../example/'),
+    },
+}
+
 
 napoleon_type_aliases = {
     # general terms
@@ -87,11 +110,12 @@ napoleon_type_aliases = {
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'classic'
-html_theme_options = {
-    "stickysidebar": "true",
-    "collapsiblesidebar": "true"
-}
+html_theme = 'alabaster'
+
+# html_theme_options = {
+#     "stickysidebar": "true",
+#     "collapsiblesidebar": "true"
+# }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

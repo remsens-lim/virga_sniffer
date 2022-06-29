@@ -116,21 +116,21 @@ class VirgaSnifferPlotAccessor:
         filllayer = self._obj.cloud_base_height.values.copy()
         filllayer[~idx_fill] = np.nan
 
-        for l in range(cbhlayer.shape[1]):
-            c = colors[l]
+        for ilayer in range(cbhlayer.shape[1]):
+            c = colors[ilayer]
             # plot cloud bases
             if cbh:
-                ax.plot(self._time, cbhlayer[:, l],
+                ax.plot(self._time, cbhlayer[:, ilayer],
                         linewidth=3,
-                        label=f'cloud base {l + 1}',
+                        label=f'cloud base {ilayer + 1}',
                         color=c)
             # plot cloud tops
             if cth:
-                cthv = self._obj.cloud_top_height.values[:, l]
+                cthv = self._obj.cloud_top_height.values[:, ilayer]
                 ax.plot(self._time, cthv,
                         linewidth=2,
-                        label=f'cloud top {l + 1}',
-                        linestyle=':',
+                        label=f'cloud top {ilayer + 1}',
+                        linestyle='--',
                         color=c)
 
         # plot lcl
@@ -139,18 +139,18 @@ class VirgaSnifferPlotAccessor:
                     linewidth=2,
                     # color=color_lcl,
                     color=colors[0],
-                    linestyle='--',
+                    linestyle=':',
                     label=label_lcl)
 
         # plot interpolated cloud base parts
         if fill:
-            for l in range(cbhlayer.shape[1]):
-                ax.plot(self._time, filllayer[:, l],
+            for ilayer in range(cbhlayer.shape[1]):
+                ax.plot(self._time, filllayer[:, ilayer],
                         linewidth=2,
                         # color=color_fill,
-                        color=colors[l],
-                        linestyle='--',
-                        label=label_fill if l == 0 else "")
+                        color=colors[ilayer],
+                        linestyle=':',
+                        label=label_fill if ilayer == 0 else "")
 
     def plot_flag_virga(self,
                         ax=None,

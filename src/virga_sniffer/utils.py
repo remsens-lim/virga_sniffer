@@ -3,7 +3,7 @@ utils.py
 ===============
 Basic utility functions used for virga_detection.py
 """
-from typing import Iterable, Union
+from typing import Iterable, Union, Tuple
 from numpy.typing import NDArray
 
 import numpy as np
@@ -74,6 +74,20 @@ def below_cloudbase(rgt: NDArray, cbh: NDArray, require_cbh: bool = True) -> NDA
             else:
                 mask[itime, slice(np.max(idxs[itime, :iranggate]), idx)] = True
     return mask
+
+
+# def below_cloudbase(idxs: NDArray[int], nrangegates: int) -> NDArray[bool]:
+#     shape = (idxs.shape[0], nrangegates)
+#     mask = np.full(shape, False)
+#     for ilayer in range(idxs.shape[1]):
+#         for itime, idx in enumerate(idxs[:, ilayer]):
+#             if ilayer == 0:
+#                 mask[itime, slice(0, idx)] = True
+#             else:
+#                 mask[itime, slice(np.max(idxs[itime, :iranggate]), idx)] = True
+#     return mask
+# def require_cloudbase():
+#     return
 
 
 def calc_lcl(p: Union[float, Iterable[float]],
