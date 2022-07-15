@@ -9,7 +9,9 @@ Welcome to Virga-Sniffer's documentation!
 
    01_introduction.md
    02_setup.md
-   autodocs.rst
+   03_autodocs.rst
+   04_changelog.md
+
 
 
 

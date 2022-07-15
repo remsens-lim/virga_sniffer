@@ -13,6 +13,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../src/'))
+sys.path.insert(0, os.path.abspath('../'))
 # sys.path.insert(0, os.path.abspath('../example/'))
 # package_path = os.path.abspath('../..')
 os.environ['PYTHONPATH'] = ':'.join((os.path.abspath('../example/'),
@@ -40,6 +41,7 @@ extensions = [
     'myst_parser',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
+    'sphinx.ext.graphviz',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.extlinks',
@@ -49,6 +51,7 @@ extlinks = {
     "doi": ("https://doi.org/%s", "doi:"),
 }
 
+graphviz_output_format = "svg"
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/', None),

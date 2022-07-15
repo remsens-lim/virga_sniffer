@@ -1,0 +1,119 @@
+digraph virgasniffer {
+    graph [
+        fontsize=20;
+        nodesep="0.1";
+        ranksep="2";
+        rankdir="TD";
+        overlap="false";
+        splines="true";
+    ];
+    edge [ arrowsize= 1.5];
+    { "cbhprocess-detail" [
+        shape="box";
+        label=<<TABLE BORDER='0'>
+                <TR align='left'><TD><i><b>cbh_processing</b></i></TD></TR>
+                <TR><TD align='left'>0: clean &amp; sort</TD></TR>
+                <TR><TD align='left'>1: split</TD></TR>
+                <TR><TD align='left'>2: merge</TD></TR>
+                <TR><TD align='left'>3: add lcl</TD></TR>
+                <TR><TD align='left'>4: smooth</TD></TR>
+              </TABLE>>
+        ];
+    };
+    {node [shape=ellipse fontsize=20];
+        "layer-rg-map" [label=<<b>rangegate mapping</b><BR align="left"/>cloud-base &amp; height> color="green"];
+        "initial-detection" [label=<<b>virga &amp; cloud detection</b>> color="green"];
+    };
+    {subgraph cluster_1 {
+        style="filled";
+        color="lightgrey";
+        node [color="blue" fontsize=20];
+        edge [color="black" arrowsize=2];
+        label=<<font><b>cloud-base layer processing</b></font>>;
+        "smooth" -> "cbhprocess-detail";
+    };};
+    {subgraph cluster_0 {
+        label=<<font><b>Input dataset</b></font>>;
+        subgraph cluster_01 {
+            node [shape="parallelogram" fontsize=20 fixedsize=true width=4.3 height=0.7];
+            label=<<font><b>mandatory</b></font>>;
+            "ze" [label=<<font>reflectivity<BR align="left"/><i>Ze</i> [dBz]</font>>];
+            "CBH0" [label=<<font>cloud-base height<BR/><i>cloud_base_height</i> [m]</font>>];
+        };
+        subgraph cluster_02 {
+            node [shape="parallelogram" fixedsize=true width=4.3 height=0.7 fontsize=20];
+            label=<<font><b>optional</b></font>>;
+            "vel" [label=<<font>doppler velocity<BR align="left"/><i>vel</i> [ms-1]</font>>];
+            "lcl" [label=<<font>lift. cond. level<BR align="left"/><i>lcl [m]</i></font>>];
+            "flag_surface_rain" [label=<<font>rain at surface?<BR/><i>flag_surface_rain</i> [bool]</font>>];
+        };
+    };};
+    {subgraph cluster_2 {
+        style="filled";
+        color="lightgrey";
+        node [color="blue" shape="box" fontsize=20 ];
+        edge [color="black"];
+        label=<<font><b>optional virga detection</b></font>>;
+        "mvel" [label=<<font>doppler velocity<BR align="left"/><i>mask_vel</i>=<b>True</b></font>>];
+        "mclut" [label=<<font>clutter<BR align="left"/><i>mask_clutter</i>=<b>True</b></font>>];
+        "mrg" [label=<<font>count valid data<BR align="left"/><i>minimum_rangegate_number</i>&gt;0</font>>]
+        "mrain" [label=<<font>rain at surface<BR align="left"/><i>mask_rain</i>=<b>True</b><BR align="left"/><i>mask_rain_ze</i> = <b>True</b></font>>];
+    };};
+    {subgraph cluster_9 {
+        label=<<font><b>Output dataset</b></font>>;
+        subgraph cluster_90 {
+            rank="same";
+            node [shape="parallelogram" fixedsize="true" width="3.5" height="0.7" fontsize=20 ]
+            label=<<font><b>direct output</b></font>>;
+            "virgaflag" [label=<<TABLE BORDER='0'>
+                                <TR align='left'><TD port="1"><i>flag_virga</i></TD></TR>
+                                <TR align='left'><TD port="2"><i>flag_virga_layer</i></TD></TR>
+                                </TABLE>>
+                        ];
+            "cloudflag" [label=<<TABLE BORDER='0'>
+                                <TR align='left'><TD port="1"><i>flag_cloud</i></TD></TR>
+                                <TR align='left'><TD port="2"><i>flag_cloud_layer</i></TD></TR>
+                                </TABLE>>
+                        ];
+            "CTH" [label="cloud_top_height"];
+            "CBH" [label="cloud_base_height"];
+        };
+        subgraph cluster_91 {
+            rank="same";
+            node [shape="parallelogram" fixedsize="true" width="3.5" height="0.7" fontsize=20 ]
+            label=<<font><b>characteristics</b></font>>;
+            "virgadepth" [label=<<TABLE BORDER='0'>
+                                <TR align='left'><TD port="1"><i>virga_depth</i></TD></TR>
+                                <TR align='left'><TD port="2"><i>virga_top/base...</i></TD></TR>
+                                </TABLE>>
+                        ];
+            "clouddepth" [label=<<TABLE BORDER='0'>
+                                <TR align='left'><TD port="1"><i>cloud_depth</i></TD></TR>
+                                <TR align='left'><TD></TD></TR>
+                                </TABLE>>
+                        ];
+        };
+    };};
+    "CBH0" -> "smooth";
+    "ze" -> "initial-detection";
+    "vel" -> "mvel";
+    "vel" -> "mclut";
+    "ze" -> "mclut";
+    "ze" -> "mrain";
+    "flag_surface_rain" -> "mrain";
+    "mvel" -> "virgaflag" [dir="both"];
+    "mclut" -> "virgaflag" [dir="both"];
+    "mrg" -> "virgaflag" [dir="both"];
+    "mrain" -> "virgaflag" [dir="both"];
+    "mrain" -> "virgaflag" [dir="both"];
+    "lcl" -> "cbhprocess-detail";
+    "cbhprocess-detail" -> "CBH"
+    {"CBH" "CTH"} -> "initial-detection";
+    "initial-detection" -> {"CTH" "CBH"};
+    "initial-detection" -> {"virgaflag" "cloudflag"};
+    "initial-detection" -> "layer-rg-map";
+    "layer-rg-map" -> "initial-detection";
+    "layer-rg-map" -> {"virgaflag":2 "cloudflag":2};
+    {"CBH" "CTH" "virgaflag":2} -> "virgadepth";
+    {"CBH" "CTH" "cloudflag":2} -> "clouddepth";
+}
