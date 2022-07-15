@@ -70,30 +70,30 @@ def process_cbh(input_data: xr.Dataset,
 
 
     cbh = input_data.cloud_base_height
-    cbh = smooth(cbh, window=config['smooth_window_cbh'])
+    cbh = smooth(cbh, window=config['cbh_smooth_window'])
 
     # prepare lifting condensation level data if required
     idx_lcl = np.full(cbh.shape[0], False)
-    if 3 in config['cbh_ident_function']:
+    if 3 in config['cbh_processing']:
         # lcl included so smooth it
         lcl = input_data.lcl
-        lcl = smooth(lcl, window=config['smooth_window_lcl'])
+        lcl = smooth(lcl, window=config['lcl_smooth_window'])
 
     # CBH Layer identification, splitting and merging, filling
-    for cbhpro in config['cbh_ident_function']:  # [1,0,2,0,3,1,0,2,0,3,4]
+    for cbhpro in config['cbh_processing']:  # [1,0,2,0,3,1,0,2,0,3,4]
         if cbhpro == 0:
             # clean data
-            cbh = clean(cbh, clean_threshold=config['clean_threshold'])
+            cbh = clean(cbh, clean_threshold=config['cbh_clean_thres'])
             # sort data
             cbh = sort(cbh)
 
         elif cbhpro == 1:
             # layer split
-            cbh = split(cbh, layer_threshold=config['layer_threshold'])
+            cbh = split(cbh, layer_threshold=config['cbh_layer_thres'])
 
         elif cbhpro == 2:
             # layer merge
-            cbh = merge(cbh, layer_threshold=config['layer_threshold'])
+            cbh = merge(cbh, layer_threshold=config['cbh_layer_thres'])
 
         elif cbhpro == 3:
             # add lcl
@@ -103,17 +103,17 @@ def process_cbh(input_data: xr.Dataset,
 
         elif cbhpro == 4:
             # more CBH smoothing
-            cbh = smooth(cbh, window=config['smooth_window_cbh'])
+            cbh = smooth(cbh, window=config['cbh_smooth_window'])
 
         else:
             raise Exception("numbers in cbh_ident_function should be in [0,4]")
 
     # interpolate cloud base height if required
     idx_fill = np.full(cbh.shape, False)
-    if config['cbh_layer_fill']:
+    if not ((config["cbh_fill_method"] is None) or (config['cbh_fill_limit'] == 0)):
         # fill layer
         cbh, idx_fill_tmp = fill_nan(cbh,
-                                     limit=config['layer_fill_limit'],
+                                     limit=config['cbh_fill_limit'],
                                      method=config["cbh_fill_method"],
                                      return_mask=True)
         idx_fill = idx_fill_tmp

@@ -20,10 +20,10 @@ from . import vsplot
 #     smooth_window_lcl=300,  # [s] smoothing of LCL if provided
 #     require_cbh=True,  # need a cloud base to be considered as virga?
 #     mask_rain=True,  # apply rain mask from ancillary data?
-#     mask_zet=True,  # apply rain mask from radar signal?
+#     mask_rain_ze=True,  # apply rain mask from radar signal?
 #     ze_thres=0,  # [dBz] minimum Radar signal at lowest range-gate which is considered rain
 #     ignore_virga_gaps=True,  # ignore gaps in virga when masking, if False, no virga after first gap (top-down)
-#     mask_minrg=2,  # minimum number of range-gates in column to be considered virga
+#     minimum_rangegate_number=2,  # minimum number of range-gates in column to be considered virga
 #     mask_vel=True,  # apply velocity mask ?
 #     vel_thres=0,  # [ms-1] velocity threshold
 #     mask_clutter=True,  # apply clutter threshold line ?
@@ -160,38 +160,23 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     idxs_top[idxs_top == -1] = vmask.shape[1] - 1
 
     # initialize temporal array
-    mask_tmp = vmask.copy()
+    mask_tmp_cloud = vmask.copy()
+    mask_tmp_virga = vmask.copy()
 
     if config['ze_max_gap'] > 0:
-        # Loop through cbh layers (bottom to top) and:
-        # * remove from virga mask, if the signal connects on top of the cbh layer (probably cloud),
-        #     but not to the next cbh layer
-        # * remove cbh layer if virga connects through this layer to the next cbh layer
-        # Checking connection of virga has a margin of "virga_max_gap" to ignore small gaps
+        mask_tmp_cloud= utils.fill_mask_gaps(mask_tmp_cloud,
+                                              altitude=ds.range.data,
+                                              max_gap=config['ze_max_gap'],
+                                              idxs_true=idxs_top)
 
-        # add True at cbh to fill nan directly on top of cbh layer
-        np.put_along_axis(mask_tmp, idxs_top, values=True, axis=1)
-
-        # switch to xarray to make use of their functions
-        mask_tmp = xr.DataArray(mask_tmp, dims=('time', 'range'),
-                                coords={'time': ds.time.data, 'range': ds.range.data})
-        mask_tmp = mask_tmp.where(mask_tmp)  # False to nan
-        mask_int = mask_tmp.dropna(dim='time', thresh=2)  # remove nan for interpolation
-
-        # interpolate mask, to fill small gaps (<layer_threshold) in virga
-        mask_int = mask_int.interpolate_na(dim='range',
-                                           method='nearest',
-                                           max_gap=config['ze_max_gap'],
-                                           bounds_error=False,
-                                           fill_value=np.nan)
-        # map back to original array
-        mask_tmp = mask_int.combine_first(mask_tmp)
-        # convert nan back to False, now we have a mask with True==virga, False==no-virga
-        # but small gaps in original mask are filled with True
-        mask_tmp = mask_tmp.fillna(False).values[:, 1:].astype(bool)
+    if config['virga_max_gap'] > 0:
+        mask_tmp_virga = utils.fill_mask_gaps(mask_tmp_virga,
+                                              altitude=ds.range.data,
+                                              max_gap=config['virga_max_gap'],
+                                              idxs_true=idxs_top)
 
     for itime in range(idxs.shape[0]):
-        for ilayer in range(1,idxs.shape[1]):
+        for ilayer in range(1, idxs.shape[1]):
             # identify index of cbh layer in radar signal
             # handling of nan values in cbh layer:
             #  * if nan choose the next higher or lower layer
@@ -207,7 +192,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                 itop = np.min(idxs_top[itime, ilayer + 1:])
             # just look at this part of the mask:
             # time i and between cbh layers
-            mask_l = mask_tmp[itime, ilow:itop]
+            mask_l = mask_tmp_cloud[itime, ilow:itop]
             if np.all(mask_l):
                 cbh.values[itime, ilayer - 1] = np.nan
             else:
@@ -215,13 +200,21 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                 if gapidx.shape[0] == 0:
                     continue
                 cth.values[itime, ilayer - 1] = rgtop[ilow + gapidx.ravel()[0]]
-                if not config['ignore_virga_gaps']:
+                if config['virga_max_gap'] == 0:
                     mask_l[:gapidx.ravel()[-1]] = False
                     vmask[itime, ilow:itop] *= mask_l
+                else:
+                    mask_l = mask_tmp_virga[itime, ilow:itop]
+                    gapidx_large = np.argwhere(~mask_l)
+                    if gapidx_large.shape[0] == 0:
+                        continue
+                    mask_l[:gapidx_large.ravel()[-1]] = False
+                    vmask[itime, ilow:itop] *= mask_l
+
 
     cth = cth.where(~np.isnan(cbh))
     # can use additional smoothing
-    cth = layer_utils.smooth(cth, window=config['smooth_window_cbh'])
+    cth = layer_utils.smooth(cth, window=config['cbh_smooth_window'])
 
     # Find index of layer data for range-gate data
     idxs_cbh = np.searchsorted(rgtop, cbh.values[:, :])  # find index of cbh layers in vmask
@@ -243,14 +236,14 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         clutter_mask = (ds.vel.values + ds.Ze.values * (config['clutter_m'] / 60.)) > config['clutter_c']
         vmask *= clutter_mask
 
-    if config['mask_minrg']:
+    if config['minimum_rangegate_number']:
         # Remove from Virga mask if column number of range-gates
-        # with a signal is lower than mask_minrg
+        # with a signal is lower than minimum_rangegate_number
         # At this stage whole column is checked a once.
         # Apply virga from different layer separately
         for itime in range(vmask.shape[0]):
             gapidx = np.argwhere(~vmask[itime, :]).ravel()
-            minrg_fail = np.argwhere(np.diff(gapidx) <= config['mask_minrg'])
+            minrg_fail = np.argwhere(np.diff(gapidx) <= config['minimum_rangegate_number'])
             for igap in minrg_fail.ravel():
                 vmask[itime, gapidx[igap]:gapidx[igap+1]] = False
 
@@ -283,7 +276,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
             layerrainmask = (ds.flag_surface_rain.values)*(idxs_cbh[:,ilayer-1] == -1)
             vmask_layer[:, :, ilayer] *= _expand_mask(~layerrainmask, vmask.shape[1])  # True if no rain at sfc
 
-    if config['mask_zet']:
+    if config['mask_rain_ze']:
         # Check if Signal of first range gate is below threshold.
         # e.g., if larger Signal, than this virga is considered rain
         # Apply only to lowest range-gate

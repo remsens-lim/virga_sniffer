@@ -1,10 +1,12 @@
 # Changelog
 
-# Version 0.3.4
+## Version 0.3.4
 
-* masking rain by *flag_surface_rain* or lowest range gate reflectivity is now applied only to lowest cloud layer
+* masking rain by *flag_surface_rain* or lowest range gate reflectivity is now applied only to the lowest cloud layer
+* cloud detection and virga detection is strongly sensitive to allowance of gaps in the radar reflectivity via the thresholds **virga_max_gap** and **ze_max_gap**. In previous version only 
+  **virga_max_gap** was used for both, but is now split for more fine tuning of cloud detection and at the same time allow for larger gaps in virga to capture also fall streak events.
 * quicklook and plotting routines are accessible as xarray Dataset accessor via 
-  ```{python}
+  ```
   import virga_sniffer
   output_dataset = virga_sniffer.virga_mask(input_dataset, config)
   output_dataset.vsplot.quicklook_full()
@@ -32,16 +34,20 @@
   * ```require_cbh=True```: need a cloud base to be considered as virga?
   * ```mask_below_cbh=True -> removed```: virga is always below cloud base
   * ```mask_connect=True -> ignore_virga_gaps=True```: the behaviour has changed and the flag is now used to switch between ignore gaps for virga mask or not
-  * ```virga_max_gap=150 -> ze_max_gap=150```: [m] maximum gap between radar reflectivity values to count as connected virga or cloud.
+  * ```virga_max_gap=150 -> virga_max_gap=700```: [m] maximum gap between radar reflectivity values to count as connected virga.
+  * ```**ze_max_gap=150**```: [m] former **virga_max_gap** but now used only for cloud detection / connection.
   * ```cbh_layer_fill=True```: fill gaps of cbh layer?
-  * ```layer_fill_limit=60```: [s] fill gaps of cbh layer with this gap limit (changed units from min to s)
+  * ```layer_fill_limit=1 -> cbh_fill_limit=60```: [s] fill gaps of cbh layer with this gap limit (changed units from min to s)
+  * ```cbh_ident_function -> cbh_processing```
+  * ```mask_minrg -> minimum_rangegate_number```
+  * ```mask_zet -> mask_rain_ze```
 
 ---
 
-# Version 3 (0.3.3)
+## Version 3 (0.3.3)
 From version 2 to version 3 the Virga-Sniffer receives a general overhaul, which basically reworks everything from the base version 0.2.0 and adds more functionality like flexible input data, multi-cloud-layer handling, etc.. Updates and General workflow with indication of changes will be summarized below. Explanation of functions, thresholds, etc. will be given in the documentation.
 
-## Virga Sniffer v3 workflow
+### Virga Sniffer v3 workflow
 1. Unify data timesteps (reference radar)
 2. Cloud base/top height preprocessing
 3. Virga identification (Virga mask for radar data)
@@ -73,7 +79,7 @@ Along with input data, the virga identification is tweaked by a number of empiri
 * ```cbh_ident_function=[1,0,2,0,3,1,0,2,0,3,4]```: order of operations applied to cbh: 0-clean, 1-split, 2-merge, 3-add-LCL, 4-smooth
 
 
-## General Updates/Changes
+### General Updates/Changes
 * remove pylarda dependency
 * use xarray and pandas (pandas for datetime handling)
 * reference time: radar data (v2: reference time ceilometer)
@@ -183,7 +189,7 @@ Remove certain Signal+Velocity combinations.
 
 ---
 
-# Version 2
+## Version 2
 
 Virga Sniffer v2  (v0.2.0 release)
   
@@ -205,10 +211,10 @@ Implemented improvements after discussion with Heike and Sebastian on 23. Novemb
 
 ---
 
-# Version 1
+## Version 1
 Readme/documentation from version 1:
 
-## Used Instruments and Variables
+### Used Instruments and Variables
 
 * LIMRAD94, 94 GHz Doppler cloud radar $\rightarrow$ Radar Reflectivity
 * CHM15k, ceilometer $\rightarrow$ cloud base heigth of first detected cloud base
@@ -243,7 +249,7 @@ Further steps can (must) be:
 - adjust routine to be run for any campaign using different rainflags (HATPRO)
 - virga detection in upper chirps with 2nd and 3rd cloud base
 
-![RV-Meteor_radar-Ze_virga-masked_20200125_2_first_try](docs/images/RV-Meteor_radar-Ze_virga-masked_20200125_2_first_try.png)
+![RV-Meteor_radar-Ze_virga-masked_20200125_2_first_try](./images/RV-Meteor_radar-Ze_virga-masked_20200125_2_first_try.png)
 
 ### First Comments Heike
 

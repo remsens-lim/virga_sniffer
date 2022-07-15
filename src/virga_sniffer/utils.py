@@ -5,10 +5,52 @@ Basic utility functions used for virga_detection.py
 """
 from typing import Iterable, Union, Tuple
 from numpy.typing import NDArray
-
+import xarray as xr
 import numpy as np
 from scipy.ndimage import median_filter
 import scipy.special
+
+
+def fill_mask_gaps(mask: NDArray[bool],
+                   altitude: NDArray[float],
+                   max_gap: float,
+                   idxs_true: NDArray[int]) -> NDArray[bool]:
+    """
+    Fill vertical gaps in a boolean mask
+    Parameters
+    ----------
+    mask
+    altitude
+    max_gap
+    idxs_true
+
+    Returns
+    -------
+    numpy.ndarray
+    """
+
+    np.put_along_axis(mask, idxs_true, values=True, axis=1)
+
+    # switch to xarray to make use of their functions
+    mask = xr.DataArray(mask, dims=('time', 'range'),
+                        coords={'time': np.arange(mask.shape[0]),
+                                'range': altitude})
+    mask = mask.where(mask)  # False to nan
+    mask_int = mask.dropna(dim='time', thresh=2)  # remove nan for interpolation
+
+    # interpolate mask, to fill small gaps (<layer_threshold) in virga
+    mask_int = mask_int.interpolate_na(dim='range',
+                                       method='nearest',
+                                       max_gap=max_gap,
+                                       bounds_error=False,
+                                       fill_value=np.nan)
+
+    # map back to original array
+    mask = mask_int.combine_first(mask)
+    # convert nan back to False, now we have a mask with True==virga, False==no-virga
+    # but small gaps in original mask are filled with True
+    mask = mask.fillna(False).values[:, 1:].astype(bool)
+    return mask
 
 
 def medfilt(input_data: NDArray, freq: float, window: float) -> NDArray:
