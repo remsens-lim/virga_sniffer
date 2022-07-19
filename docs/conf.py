@@ -97,10 +97,12 @@ napoleon_type_aliases = {
 #
 html_theme = 'alabaster'
 
-# html_theme_options = {
-#     "stickysidebar": "true",
-#     "collapsiblesidebar": "true"
-# }
+html_theme_options = {
+    "fixed_sidebar": "true",
+    "logo": "lim.jpg",
+    "logo_name": "true",
+    "description": "University of Leipzig, Institute for Meteorology, Remote Sensing and the Arctic System."
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

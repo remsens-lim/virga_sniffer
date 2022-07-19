@@ -51,17 +51,22 @@ digraph virgasniffer {
     {subgraph cluster_2 {
         style="filled";
         color="lightgrey";
-        node [color="blue" shape="box" fontsize=20 ];
+        nodesep=0.03;
+        node [color="blue" shape="box" fontsize=20];
         edge [color="black"];
         label=<<font><b>optional virga detection</b></font>>;
         "mvel" [label=<<font>doppler velocity<BR align="left"/><i>mask_vel</i>=<b>True</b></font>>];
         "mclut" [label=<<font>clutter<BR align="left"/><i>mask_clutter</i>=<b>True</b></font>>];
         "mrg" [label=<<font>count valid data<BR align="left"/><i>minimum_rangegate_number</i>&gt;0</font>>]
-        "mrain" [label=<<font>rain at surface<BR align="left"/><i>mask_rain</i>=<b>True</b><BR align="left"/><i>mask_rain_ze</i> = <b>True</b></font>>];
+        "mrain" [label=<<font>rain at surface<BR align="left"/><i>mask_rain</i>=<b>True</b><BR align="left"/><i>mask_rain_ze</i>=<b>True</b></font>>];
+         {"mclut" "mvel" "mrain"} -> "mrg"  [style="invis"]
+
     };};
+
+
     {subgraph cluster_9 {
         label=<<font><b>Output dataset</b></font>>;
-        subgraph cluster_90 {
+
             rank="same";
             node [shape="parallelogram" fixedsize="true" width="3.5" height="0.7" fontsize=20 ]
             label=<<font><b>direct output</b></font>>;
@@ -77,7 +82,7 @@ digraph virgasniffer {
                         ];
             "CTH" [label="cloud_top_height"];
             "CBH" [label="cloud_base_height"];
-        };
+
         subgraph cluster_91 {
             rank="same";
             node [shape="parallelogram" fixedsize="true" width="3.5" height="0.7" fontsize=20 ]
@@ -98,13 +103,13 @@ digraph virgasniffer {
     "ze" -> "initial-detection";
     "vel" -> "mvel";
     "vel" -> "mclut";
-    "ze" -> "mclut";
+    "ze" -> "mclut" [dir="both" weight=1];
     "ze" -> "mrain";
     "flag_surface_rain" -> "mrain";
-    "mvel" -> "virgaflag" [dir="both"];
-    "mclut" -> "virgaflag" [dir="both"];
-    "mrg" -> "virgaflag" [dir="both"];
-    "mrain" -> "virgaflag" [dir="both"];
+    "mvel" -> "virgaflag" [dir="both" weight=1];
+    "mclut" -> "virgaflag" [dir="both" weight=1];
+    "mrg" -> "virgaflag" [dir="both" weight=1];
+    "mrain" -> "virgaflag" [dir="both" weight=1];
     "mrain" -> "virgaflag" [dir="both"];
     "lcl" -> "cbhprocess-detail";
     "cbhprocess-detail" -> "CBH"
@@ -114,6 +119,7 @@ digraph virgasniffer {
     "initial-detection" -> "layer-rg-map";
     "layer-rg-map" -> "initial-detection";
     "layer-rg-map" -> {"virgaflag":2 "cloudflag":2};
-    {"CBH" "CTH" "virgaflag":2} -> "virgadepth";
-    {"CBH" "CTH" "cloudflag":2} -> "clouddepth";
+    {"CBH" "virgaflag":2} -> "virgadepth";
+    {"CBH" "CTH" } -> "clouddepth";
+
 }

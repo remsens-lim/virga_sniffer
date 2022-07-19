@@ -1,9 +1,23 @@
 # Setup
 
+- install via pip - github
+
+```{code-block} python
+---
+lineno-start: 1
+caption: Imports
+---
+import xarray as xr
+from virga_sniffer import virga_mask as mvirga
+```
+
+
+
 (configuration)=
 ## Configuration
 The Virga-Sniffer utilizes a variety of flags and thresholds to detect virga from the given input data.
 
+(cfg_flag)=
 ### Flags
 Flags are boolean values which control certain functionality of the Virga-Sniffer:
  - **require_cbh = True**: If **True**, detected virga always have to be attributed to a cloud-base height (CBH) value. This prevents False-positive detection of virga which actually would be a cloud in case of data-gaps in the ceilometer CBH data. If **False**, this requirement is dropped and virga events, where the cloud is already gone, can be detected. It is highly recommended to use **True** when working with multi-layer CBH, as gaps in ceilometer data are introduced by clouds in the lower layers. To circumvent the issue of ceilometer data gaps, one can adjust CBH-layer fill (*cbh_layer_fill_...*) thresholds. The default is **True**.
@@ -33,6 +47,7 @@ Flags are boolean values which control certain functionality of the Virga-Sniffe
  - **mask_rain_ze**: Similar to **mask_rain**, but instead of using *flag_surface_rain* from the input data, the radar reflectivity at the lowest range-gate is tested against the **ze_thres** 
    threshold in order to estimate if precipitation will reach the surface.
 
+(cfg_thres)=
 ### Thresholds
 Virga detection specific thresholds:
  - **minimum_rangegate_number = 2**:
@@ -56,7 +71,7 @@ Cloud-base preprocessing specific thresholds:
  - **cbh_clean_thres = 0.05 [0-1]**:
  - **cbh_fill_limit = 60 s**:
 
-
+(cfg_spec)=
 ### Special configuration
 Appart from thresholds, the cloud-base preprocessing is controlled by specialized configuration:
  - **cbh_fill_method = "slinear"**:
