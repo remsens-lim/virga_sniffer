@@ -143,6 +143,9 @@ def clean(input_data: xr.DataArray, clean_threshold: float) -> xr.DataArray:
     layer_ndatapoints = np.count_nonzero(~np.isnan(data_tmp), axis=0)
     layer_nthreshold = clean_threshold * data_tmp.shape[0]
     data_tmp = data_tmp[:, layer_ndatapoints > layer_nthreshold]
+    # guarantee at least one layer of nan values.
+    if data_tmp.shape[1] == 0:
+        data_tmp = np.full((data_tmp.shape[0],1),np.nan)
     output_data = xr.DataArray(data_tmp,
                                coords={dims[0]: input_data[dims[0]].data,
                                        dims[1]: np.arange(data_tmp.shape[1])})

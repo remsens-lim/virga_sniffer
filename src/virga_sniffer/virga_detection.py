@@ -222,6 +222,9 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     idxs_cth = np.searchsorted(rgtop, cth.values[:, :])  # find index of cth layers in vmask
     idxs_cth[idxs_cth == ds.range.size] = -1  # if cbh == nan or above highest range gate, fill with -1
 
+    # remove cloud top height value if there is no cloud
+    cth = cth.where(idxs_cth != idxs_cbh)
+
     if config['mask_vel']:
         # Consider as Virga if doppler velocity is below threshold
         # Velocity < 0 is considered as falling droplets

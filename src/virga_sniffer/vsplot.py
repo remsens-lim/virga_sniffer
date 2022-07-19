@@ -412,8 +412,8 @@ class VirgaSnifferPlotAccessor:
             cloud_patch = mpatches.Patch(color="#a6cee3", label='flag_cloud')
             radar_patch = mpatches.Patch(color="#7fc97f", label='radar-signal')
             cloud_base_line = Line2D([0], [0], color='k', lw=2)
-            cloud_layer_fill = Line2D([0], [0], color='k', lw=2, ls='--')
-            cloud_top_line = Line2D([0], [0], color='k', lw=2, ls=':')
+            cloud_layer_fill = Line2D([0], [0], color='k', lw=2, ls=':')
+            cloud_top_line = Line2D([0], [0], color='k', lw=2, ls='--')
 
             ax.legend([cloud_base_line, cloud_top_line, cloud_layer_fill,
                        radar_patch, virga_patch, cloud_patch],
