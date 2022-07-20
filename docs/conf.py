@@ -101,7 +101,7 @@ html_theme_options = {
     "fixed_sidebar": "true",
     "logo": "lim.jpg",
     "logo_name": "true",
-    "description": "University of Leipzig, Institute for Meteorology, Remote Sensing and the Arctic System."
+    "description": "University of Leipzig, Institute for Meteorology"
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

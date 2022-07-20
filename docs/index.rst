@@ -7,10 +7,13 @@ Welcome to Virga-Sniffer's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   01_introduction.md
-   02_setup.md
-   03_autodocs.rst
-   04_changelog.md
+   method.md
+   setup.md
+   datasets.md
+   config.md
+   caveats.md
+   autodocs.rst
+   changelog.md
 
 
 

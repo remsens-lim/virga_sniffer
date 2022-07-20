@@ -1,6 +1,8 @@
--------------
-virga_sniffer
--------------
+------------------
+Code Documentation
+------------------
+
+.. virga_detection:
 
 virga_detection.py
 ==================
@@ -12,10 +14,15 @@ layer_utils.py
    .. automodule:: virga_sniffer.layer_utils
       :members:
 
+.. utils:
+
 utils.py
 ==================
    .. automodule:: virga_sniffer.utils
       :members:
+
+
+.. vsplot:
 
 vsplot.py
 ==================

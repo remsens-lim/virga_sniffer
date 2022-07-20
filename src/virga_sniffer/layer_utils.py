@@ -42,7 +42,7 @@ def process_cbh(input_data: xr.Dataset,
 
     config: dict, optional
         The configuration flags and thresholds.
-        Will be merged with the default configuration, see :ref:`02_setup.md#configuration`.
+        Will be merged with the default configuration, see :ref:`config.md#configuration`.
 
 
     Returns
