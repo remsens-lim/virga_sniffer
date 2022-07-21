@@ -29,7 +29,7 @@ from virga_sniffer.utils import calc_lcl
 ```
 ```{code-block} python
 ---
-lineno-start: 4
+lineno-start: 5
 caption: Preparations
 ---
 # Prepare the configuration
@@ -60,7 +60,7 @@ input_ds = xr.Dataset({
 
 ```{code-block} python
 ---
-lineno-start: 28
+lineno-start: 29
 caption: Run virga detection
 ---
 dsout = mvirga(input_ds)
