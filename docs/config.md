@@ -1,7 +1,8 @@
 (configuration)=
 # Configuration
 The Virga-Sniffer utilizes a variety of flags and thresholds to detect virga from the given input data. The configuration can be set via the *config* dictionary, which will be merged with the 
-default values. In the following all configuration flags, thresholds and settings, and their respective default values are described.  
+default values. In the following all configuration flags, thresholds and settings, and their respective default values are described. 
+See also the [configuration demo](https://mybinder.org/v2/gh/remsens-lim/virga_sniffer/main?filepath=example/virga-sniffer_config_demo.ipynb).
 
 (cfg_flag)=
 ## Flags
@@ -62,5 +63,5 @@ Apart from thresholds, the cloud-base preprocessing is controlled by specialized
 
 ## Demonstration
 An interactive demonstration of the virga-sniffer configuration is available as jupyter notebook (check *examples* directory, see [Setup/Configuration-Demonstration](cfg-demo)).
-% and viewable here:
-% [nbviewer](https://nbviewer.org/github/jonas-witthuhn/virga_sniffer/example/virga-sniffer_config_demo.ipynb).
+The notebook can be viewed in
+[binder](https://mybinder.org/v2/gh/remsens-lim/virga_sniffer/main?filepath=example/virga-sniffer_config_demo.ipynb).
