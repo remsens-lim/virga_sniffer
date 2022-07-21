@@ -9,7 +9,7 @@ setup(
     author_email="remsensarctic@uni-leipzig.de",
     packages=["virga_sniffer"],
     package_dir={"": "src"},
-    package_data={"virga_sniffer": ["config_*.json"]},
+    package_data={"": ["*.json"]},
     include_package_data=True,
     install_requires=["numpy",
                       "xarray",
