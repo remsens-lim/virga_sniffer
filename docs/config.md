@@ -61,6 +61,6 @@ Apart from thresholds, the cloud-base preprocessing is controlled by specialized
  - **cbh_processing = [1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4]**: This list defines the methods applied for [preprocessing](preprocessing). 
 
 ## Demonstration
-An interactive demonstration of the virga-sniffer configuration is available as jupyter notebook (check *examples* directory).
+An interactive demonstration of the virga-sniffer configuration is available as jupyter notebook (check *examples* directory, see [Setup/Configuration-Demonstration](cfg-demo)).
 % and viewable here:
 % [nbviewer](https://nbviewer.org/github/jonas-witthuhn/virga_sniffer/example/virga-sniffer_config_demo.ipynb).

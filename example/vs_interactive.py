@@ -85,9 +85,7 @@ def vmask_interact(input_file,
     return 0
 
 def vsinteractive():
-
     style = {'description_width': 'initial'}
-    input_file = widgets.FileUpload(accept='.nc', multiple=False)
     input_file = widgets.Text(
         value="../example/test_data/2020-01-24_00_virga-sniffer_input.nc",
         placeholder='path to input file')
@@ -100,15 +98,12 @@ def vsinteractive():
     lcl_smooth_window = widgets.IntSlider(min=0, max=600, step=60,
                                           value=default_config['lcl_smooth_window'],
                                           continuous_update=False)
-    # mask_below_cbh = widgets.Checkbox(value=default_config['mask_below_cbh'], indent=False)
     require_cbh = widgets.Checkbox(value=default_config['require_cbh'], indent=False)
     mask_rain = widgets.Checkbox(value=default_config['mask_rain'], indent=False)
     mask_rain_ze = widgets.Checkbox(value=default_config['mask_rain_ze'], indent=False)
     ze_thres = widgets.IntSlider(min=-40, max=20, step=2,
                                  value=default_config['ze_thres'],
                                  continuous_update=False)
-    # mask_connect = widgets.Checkbox(value=default_config['mask_connect'], indent=False)
-    ignore_virga_gaps = widgets.Checkbox(value=default_config['ignore_virga_gaps'], indent=False)
     minimum_rangegate_number = widgets.IntSlider(min=0, max=10, step=1,
                                    value=default_config['minimum_rangegate_number'],
                                    continuous_update=False)
@@ -147,7 +142,7 @@ def vsinteractive():
     cbh_fill_limit=widgets.IntSlider(min=0, max=5*60, step=1,
                                        value=default_config['cbh_fill_limit'])
     cbh_fill_method = widgets.Dropdown(
-        options=['ffill','bfill','nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'polynomial'],
+        options=['ffill', 'bfill', 'nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'polynomial'],
         value=default_config['cbh_fill_method'],
         description='',
         disabled=False,
@@ -161,21 +156,19 @@ def vsinteractive():
         widgets.HBox([widgets.VBox([Label("CBH Layer processing:"),Label("0-clean, 1-split, 2-merge, 3-LCL, 4-smooth (default  == 1,0,2,0,3,1,0,2,0,3,4)")]),
                       cbh_processing]),
         widgets.HBox([Label("Layer max filling [min]:"),cbh_fill_method,cbh_fill_limit]),
-        # widgets.HBox([Label("Merge LCL:"),merge_LCL]),
         widgets.HBox([Label("LCL smooth window [s]:"),lcl_smooth_window]),
         Label("Virga Mask: -----------------------------------------------------------"),
-        # widgets.HBox([Label("Mask below CBH:"),mask_below_cbh]),#Label('Restrict Virga below CBH layer, 0=off')
-        widgets.HBox([Label("Require CBH          :"),require_cbh]),#Label('Detection of Virga requires CBH value in column')
+        widgets.HBox([Label("Require CBH          :"), require_cbh]),#Label('Detection of Virga requires CBH value in column')
         widgets.HBox([Label("Rain Mask (Ze) [dBz] :"),  ze_thres,mask_rain_ze]),#Label("No Virga if Ze of lowest range-gate is above threshold [dBz]")
-        widgets.HBox([Label("Rain Mask (DWD)      :"),mask_rain]),#, Label("If DWD detects Rain => no virga")
+        widgets.HBox([Label("Rain Mask (DWD)      :"), mask_rain]),#, Label("If DWD detects Rain => no virga")
         widgets.HBox([Label("Doppler Velocity Mask [ms-1]:"),vel_thres,mask_vel]),#Label("Virga, if Dopplervelocity below threshold [m s-1]"
         widgets.HBox([Label("Virga max gap [m]"), virga_max_gap]),#Label("Requires this number of range-gates connected to CBH to be counted as virga."
         widgets.HBox([Label("Ze max gap [m]:"), ze_max_gap]),
         widgets.HBox([Label("Number of RG required:"), minimum_rangegate_number]),#Label("Requires this number of virga range-gates to be counted as virga."
-        widgets.HBox([Label("Masking Ze+Vel relation:"),clutter_m,clutter_c, mask_clutter]),
+        widgets.HBox([Label("Masking Ze+Vel relation:"), clutter_m, clutter_c, mask_clutter]),
         Label("Data chooser: ----------------------------------------------------------"),
-        widgets.HBox([Label("Choose alternative Input-file:"),input_file]),
-        widgets.HBox([Label("Max Altitude [m]     :"),ymax]),
+        widgets.HBox([Label("Choose alternative Input-file:"), input_file]),
+        widgets.HBox([Label("Max Altitude [m]     :"), ymax]),
         ])
 
     out = widgets.interactive_output(vmask_interact,

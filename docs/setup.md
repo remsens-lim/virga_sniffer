@@ -1,6 +1,21 @@
 # Setup
+## Virga-Sniffer
 
-- install via pip - github
+The Virga-Sniffer can be installed via pip and the github repository:
+```
+python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer
+```
+The following packages will be installed: 
+ - virga_sniffer
+ - numpy
+ - scipy
+ - pandas
+ - xarray
+ - netcdf4
+ - bottleneck
+ - matplotlib
+
+After installing, the Virga-Sniffer module can be accessed as demonstrated below:
 
 ```{code-block} python
 ---
@@ -69,6 +84,56 @@ for dtime in range(0,24,3):
 ```{figure} ../docs/images/vs_demonstration_maxgap_multilayer.jpg
 Example quicklook from virga_sniffer.vsplot.quicklook_flag_virga
 ```
+
+
+
+(cfg-demo)=
+## Configuration Demonstration
+To run the example jupyter notebook additional dependencies can be installed via:
+```
+python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer[example]
+```
+This will install additionally:
+ - jupyter
+ - jupyterlab
+ - ipywidgets
+ - ipympl
+
+To run the demonstration of the virga-sniffer configuration, these files have to be downloaded from the repository:
+ - [virga-sniffer_config_demo.ipynb](../example/virga-sniffer_config_demo.ipynb)
+ - [vs_interactive.py](../example/vs_interactive.py)
+ - [test_data](../example/test_data/2020-01-24_00_virga-sniffer_input.nc)
+ 
+Or, the zipped data can be downloaded: 
+```{eval-rst} 
+:download:`example.zip <../example/example.zip>`
+```
+
+Once installed and downloaded, the jupyter notebook can be run. The configuration of the Virga-Sniffer can be tested with the interactive widgets:
+```{figure} images/vs-jlab-demo.jpg```
+
+The result will be shown as a [full quicklook](vsplot).
+
+## Building the docs
+To build the docs, additional dependencies can be installed via:
+```
+python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer[docs]
+```
+
+Then, the docs can be build with 
+(see [sphinx documentation](https://www.sphinx-doc.org/en/master/man/sphinx-build.html)):
+```
+cd <path-to-virga_sniffer>/docs/
+make html
+```
+or
+```
+cd <path-to-virga_sniffer>/docs/
+make latex
+```
+
+
+
 
 
 
