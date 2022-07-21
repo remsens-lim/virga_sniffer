@@ -28,8 +28,7 @@ python:
   version: "3.10"
   install:
     - method: pip
-      path: .
+      path: requirements.txt
       extra_requirements:
         - docs
-    - method: setuptools
     
