@@ -5,6 +5,10 @@ As input source **radar reflectivity** and **ceilometer cloud-base height** obse
 # Documentation
 The documentation is hosted at [readthedocs](https://virga-sniffer.readthedocs.io/en/latest/index.html).
 
+# Demonstration
+The example/virga-sniffer_config_demo.ipynb can be executet in 
+[binder](https://mybinder.org/v2/gh/remsens-lim/virga_sniffer/main?filepath=example/virga-sniffer_config_demo.ipynb).
+
 # Installation
 The package can be installed via pip:
 ```

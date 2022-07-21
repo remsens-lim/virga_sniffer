@@ -89,7 +89,10 @@ Example quicklook from virga_sniffer.vsplot.quicklook_flag_virga
 
 (cfg-demo)=
 ## Configuration Demonstration
-To run the example jupyter notebook additional dependencies can be installed via:
+To view the interactive demonstration of the Virga-Sniffer configuration, the example notebook can be run in
+[binder](https://mybinder.org/v2/gh/remsens-lim/virga_sniffer/main?filepath=example/virga-sniffer_config_demo.ipynb).
+
+To run the example jupyter notebook yourself, additional dependencies can be installed via:
 ```
 python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer[example]
 ```
@@ -110,7 +113,8 @@ Or, the zipped data can be downloaded:
 ```
 
 Once installed and downloaded, the jupyter notebook can be run. The configuration of the Virga-Sniffer can be tested with the interactive widgets:
-```{figure} images/vs-jlab-demo.jpg```
+```{figure} images/vs-jlab-demo.jpg
+```
 
 The result will be shown as a [full quicklook](vsplot).
 
