@@ -8,7 +8,7 @@ The workflow of the detection scheme as summarized by the flowchart is structure
  2. Baseline precipitation and cloud detection
  3. (Optional) Virga detection refinement
 
-```{figure} images/flowchart.png
+```{figure} images/flowchart.svg
 ```
 
 ## Input data
