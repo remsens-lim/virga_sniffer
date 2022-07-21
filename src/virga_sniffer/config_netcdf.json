@@ -1,0 +1,96 @@
+{
+  "flag_virga": {
+    "long_name": "Virga Flag",
+    "note": "True if virga is identified."
+  },
+  "flag_virga_layer": {
+    "long_name": "Virga Flag for each cloud layer",
+    "note": "True if virga is identified."
+  },
+  "flag_cloud": {
+    "long_name": "Cloud Flag",
+    "note": "True if cloud is identified by selecting valid radar signal between cloud base and top."
+  },
+  "flag_cloud_layer": {
+    "long_name": "Cloud Flag for each cloud layer",
+    "note": "True if cloud is identified by selecting valid radar signal between cloud base and top."
+  },
+  "virga_top_height": {
+    "long_name": "virga top height",
+    "note": "virga top height according to upper edge of last range gate with virga",
+    "units": "m"
+  },
+  "virga_base_height": {
+    "long_name": "virga base height",
+    "note": "virga base height according to lower edge of first range gate with virga",
+    "units": "m"
+  },
+  "cloud_top_height": {
+    "long_name": "cloud top height",
+    "standard_name": "cloud_top_altitude",
+    "units": "m"
+  },
+  "cloud_base_height": {
+    "long_name": "cloud base height",
+    "standard_name": "cloud_base_altitude",
+    "units": "m"
+  },
+  "cloud_top_rg": {
+    "long_name":"cloud top range gate index"
+  },
+  "virga_top_rg": {
+    "long_name": "virga top range gate index"
+  },
+  "cloud_base_rg": {
+    "long_name": "cloud base range gate index"
+  },
+  "virga_base_rg": {
+    "long_name": "virga base range gate index"
+  },
+  "cloud_depth": {
+    "long_name": "cloud depth (cloud top - cloud base)",
+    "units": "m"
+  },
+  "virga_depth": {
+    "long_name": "virga depth (virga top - virga base)",
+    "note": "This value excludes range-gates where radar reflectivity is zero or nan. It is calculated by sum(rangegates_with_virga_top - rangegates_with_virga_base)",
+    "units": "m"
+  },
+  "virga_depth_maximum_extend": {
+    "long_name": "virga depth (virga top - virga base)",
+    "note": "This value includes range-gates where radar reflectivity is zero or nan. Therefore, this is a measure of geometric maximum depth of virga. For volumetric statistics it is advisable to use virga_depth (excluding empty radar range-gates).",
+    "units": "m"
+  },
+  "flag_lcl_filled": {
+    "note": "True if lowest CBH is filled with calculated lifting-condensation-level"
+  },
+  "flag_cbh_interpolated": {
+    "note": "True if CBH value is interpolated and not observed"
+  },
+  "flag_surface_rain": {
+    "note": "True if rain is detected at surface"
+  },
+  "vel": {
+    "long_name": "radar doppler velocity",
+    "units": "ms-1"
+  },
+  "Ze": {
+    "long_name": "radar reflectivity",
+    "units": "dBz"
+  },
+  "range": {
+    "long_name": "mid of radar range gate",
+    "standard_name": "altitude",
+    "units": "m"
+  },
+  "range_top": {
+    "long_name": "calculated top of radar range gate",
+    "standard_name": "altitude",
+    "units": "m"
+  },
+  "range_base": {
+    "long_name": "calculated base of radar range gate",
+    "standard_name": "altitude",
+    "units": "m"
+  }
+}
