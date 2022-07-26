@@ -1,6 +1,6 @@
 # Caveats
-The Virga-Sniffer is a column based detection scheme for virga events. The detection is strongly tuned and manually evaluated for best performance of the dataset (TODO:cite) it relies on threshold 
-based tests which might not work in other environments or different input data setup. Some major caveats to have an eye on while using the Virga-Sniffer are outlined below:
+The Virga-Sniffer is a column based detection scheme for virga events. The detection is strongly tuned and manually evaluated for best performance with the dataset (TODO:cite)
+It relies on threshold based tests which might not work in other environments or with different input data setup. Some major caveats to have an eye on while using the Virga-Sniffer are outlined below:
 
 ```{figure} ../docs/images/vs_demonstration_maxgap_multilayer.jpg
 :alt: ze_max_gap to small
@@ -10,8 +10,8 @@ Virga sniffer output at a situation to reveal some caveats. At 03:45 UTC - fract
 ```
 
 ## Fractured radar reflectivity signal
-Virga events are associated with a certain cloud-base height (if **require_cbh = True**). Precipitation below a cloud-base height layer, which do not reach the surface is considered virga. In case 
-of fractured radar signal (see {ref}`demonstration figure <fig-ze-max-gap>` at around 03:45 UTC). The virga associated with the cloud-base will far below if the gaps are small enough 
+Virga events are associated with a certain cloud-base height (if **require_cbh = True**). Precipitation below a cloud-base height layer, which does not reach the surface is considered virga. In case 
+of a fractured radar signal (see {ref}`demonstration figure <fig-ze-max-gap>` at around 03:45 UTC) the virga associated with the cloud-base will be far below the cloud if the gaps are small enough 
 (**ze_max_gap** threshold). This should be kept in mind when using output values of **virga_base** and **virga_top** as they mark the maximum extend of virga plus the gaps, which is 
 **virga_depth_maximum_extend**. The output value **virga_depth** is calculated by excluding these gaps and therefore should be used when calculating volumetric characteristics. Anyway, this caveat 
 can be circumvented by not ignoring gaps in virga setting the **ignore_virga_gaps** flag to **False**, although this would mean to cut some virga (especially in fall streaks). 
