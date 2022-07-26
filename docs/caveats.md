@@ -28,7 +28,7 @@ issues if upper layer clouds are present:
  2. **ze_max_gap** is too large: Similarly, if the gap allowance is too large, clouds will expand over the precipitation from upper layer clouds when close to lower layer cloud top height. 
 
 ## Multi-layer cloud transition
-The data points of radar reflectivity might connect (without gaps or gaps smaller **ze_max_gap** threshold) through multiple layer of clouds defined by the ceilometer observed cloud base heights. 
-This is the case for example in  the {ref}`demonstration figure <fig-ze-max-gap>` at around 05:00 and 05:45 UTC. During processing with the Virga-Sniffer, these cases assumed connected and lower 
-layer cloud-base height values are dropped. But this might result in sudden *jump* of virga extend, if gaps in upper layers of cloud-base height occur. These gaps might result when the ceilometer 
+The data points of radar reflectivity might connect (without gaps or gaps smaller **ze_max_gap** threshold) through multiple layers of clouds defined by the ceilometer observed cloud base heights. 
+This is the case for example in  the {ref}`demonstration figure <fig-ze-max-gap>` at around 05:00 and 05:45 UTC. During processing with the Virga-Sniffer, these cases are assumed to be connected and lower 
+layer cloud-base height values are dropped. But this might result in sudden *jumps* of virga extend, if gaps in upper layers of cloud-base height occur. These gaps might occur when the ceilometer 
 beam is attenuated by the lower level cloud to a large extend. Gaps in ceilometer data can be filled (**cbh_layer_fill = True**) by increasing the **layer_fill_limit** threshold.
