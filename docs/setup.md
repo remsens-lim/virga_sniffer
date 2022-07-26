@@ -1,7 +1,7 @@
 # Setup
 ## Virga-Sniffer
 
-The Virga-Sniffer can be installed via pip and the github repository:
+The Virga-Sniffer can be installed via pip and the GitHub repository:
 ```
 python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer
 ```
