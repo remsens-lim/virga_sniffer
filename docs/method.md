@@ -13,7 +13,7 @@ The workflow of the detection scheme as summarized by the flowchart is structure
 
 ## Input data
 The Virga-Sniffer virga detection method receives as bare minimum input the *radar reflectivity* and values of *cloud-base height*. Ancillary data is accepted (and highly recommended) to refine the 
-virga_detection. Optional input data are the *doppler velocity*, *rain at surface flag*, *lifting condensation level*. For a detailed descriptions see [Input dataset](input).
+virga detection. Optional input data are the *doppler velocity*, *rain at surface flag*, *lifting condensation level*. For a detailed descriptions see [Input dataset](input).
 
 (preprocessing)=
 ## Cloud-base preprocessing
