@@ -17,15 +17,15 @@ of a fractured radar signal (see {ref}`demonstration figure <fig-ze-max-gap>` at
 can be circumvented by not ignoring gaps in virga setting the **ignore_virga_gaps** flag to **False**, although this would mean to cut some virga (especially in fall streaks). 
 
 ## Cloud - virga differentiation (in upper layer clouds)
-If clouds are present in multi levels, virga-detection is challenging, as only the cloud-base is known a priori and the vertical extend of the precipitating cloud is not. The Virga-Sniffer 
-includes a cloud and cloud-top detection which is heavily sensitive to the **ze_max_gap** threshold and by essence defines the cloud top where gaps in radar reflectivity occur. This raises two 
+If clouds are present in multiple levels (heights), virga detection is challenging, as only the cloud-base is known a priori and the vertical extend of the precipitating cloud is not. The Virga-Sniffer 
+includes a cloud and cloud-top detection which is heavily sensitive to the **ze_max_gap** threshold and by essence defines the cloud top where large enough gaps in radar reflectivity occur. This raises two 
 issues if upper layer clouds are present:
- 1. **ze_max_gap** is to small: Due to uncertainties in observational cloud-base height or radar reflectivity data, misalignment of both data or coarse resolution of radar range-gates, 
+ 1. **ze_max_gap** is too small: Due to uncertainties in observational cloud-base height or radar reflectivity data, misalignment of both data or coarse resolution of radar range-gates, 
     ceilometer detected cloud bases might not connect directly to a valid radar signal. Assume, the cloud-base height value is below the first range-gate with valid radar signal and the gap is 
     larger than **ze_max_gap**, the cloud will not be detected and no cloud-top will be assigned. In turn, these range-gates which are not marked as cloud due to that will be potentially marked as 
     virga from higher level clouds if **ignore_virga_gaps** is True (default) and the precipitation of the upper layer is close to the lower layer cloud. See the {ref}`demonstration figure <fig-ze-max-gap>` at 
     around 05:00 UTC. 
- 2. **ze_max_gap** is to large: Similarly, if the gap allowance is to large, clouds will expand over the precipitation from upper layer clouds when close to lower layer cloud top height. 
+ 2. **ze_max_gap** is too large: Similarly, if the gap allowance is too large, clouds will expand over the precipitation from upper layer clouds when close to lower layer cloud top height. 
 
 ## Multi-layer cloud transition
 The data points of radar reflectivity might connect (without gaps or gaps smaller **ze_max_gap** threshold) through multiple layer of clouds defined by the ceilometer observed cloud base heights. 
