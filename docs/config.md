@@ -22,8 +22,8 @@ Flags are boolean values which control certain functionality of the Virga-Sniffe
    where *vel* and *Ze* denotes the input Doppler velocity [ms-1] and radar reflectivity [dBz], respectively (see [Doppler velocity based refinement](mvel)). The default is **True**, therefore, 
    the Doppler velocity (*vel*) has to be included in 
    the input dataset.
- - **mask_rain = True**: If **True**, this flag switches on the use of the *flag_surface_rain* variable from the input dataset in order to consider virga only, if the no rain is observed at the 
-   surface. This is applied to the lowest present cloud layer at given time. Therefore, higher layer virga events will not be masked if rain is detected at the surface.
+ - **mask_rain = True**: If **True**, this flag switches on the use of the *flag_surface_rain* variable from the input dataset in order to consider virga only, if no rain is observed at the 
+   surface. This is applied to the lowest present cloud layer at any given time. Therefore, higher layer virga events will not be masked if rain is detected at the surface.
  - **mask_rain_ze**: Similar to **mask_rain**, but instead of using *flag_surface_rain* from the input data, the radar reflectivity at the lowest range gate is tested against the **ze_thres** 
    threshold in order to estimate if precipitation will reach the surface.
 
@@ -36,9 +36,9 @@ Virga detection specific thresholds:
  - **virga_max_gap = 700 m**: From each cloud-base layer, the detection of virga advances downwards. Virga is detected until a gap (nan-value) of radar-reflectivity larger than **virga_max_gap** 
    occurs. The default value is 700m to also capture virga in fall streaks relatively far below the cloud base, but mask out any clutter or not identified cloud close to the surface or lower cloud 
    layer.
- - **vel_thres = 0 ms-1**: Defines the Doppler velocity threshold. If **vel_mask** is set to **True** (default), an datapoint is considered virga only if the Doppler velocity is below this threshold. 
+ - **vel_thres = 0 ms-1**: Defines the Doppler velocity threshold. If **vel_mask** is set to **True** (default), a datapoint is considered virga only if the Doppler velocity is below this threshold. 
    The 
-   default value is 0 [ms-1], therefore only falling hydro meteors are considered virga.
+   default value is 0 [ms-1], therefore only falling hydrometeors are considered virga.
  - **ze_thres = 0 dBz**: This threshold is applied if **mask_rain_ze = True**. If the value of radar reflectivity of the lowest range is larger than **ze_thres**, precipitation is assumed to reach 
    the ground and not considered virga in the lowest cloud layer. 
  - **clutter_m = 4 ms-1**: Slope of the linear masking dependency (see **mask_clutter**).
@@ -62,6 +62,6 @@ Apart from thresholds, the cloud-base preprocessing is controlled by specialized
  - **cbh_processing = [1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4]**: This list defines the methods applied for [preprocessing](preprocessing). 
 
 ## Demonstration
-An interactive demonstration of the virga-sniffer configuration is available as jupyter notebook (check *examples* directory, see [Setup/Configuration-Demonstration](cfg-demo)).
+An interactive demonstration of the virga-sniffer configuration is available as a jupyter notebook (check *examples* directory, see [Setup/Configuration-Demonstration](cfg-demo)).
 The notebook can be viewed in
 [binder](https://mybinder.org/v2/gh/remsens-lim/virga_sniffer/main?filepath=example/virga-sniffer_config_demo.ipynb).
