@@ -102,7 +102,7 @@ This will install additionally:
  - ipywidgets
  - ipympl
 
-To run the demonstration of the virga-sniffer configuration, these files have to be downloaded from the repository:
+To run the demonstration of the Virga-Sniffer configuration, these files have to be downloaded from the repository:
  - [virga-sniffer_config_demo.ipynb](../example/virga-sniffer_config_demo.ipynb)
  - [vs_interactive.py](../example/vs_interactive.py)
  - [test_data](../example/test_data/2020-01-24_00_virga-sniffer_input.nc)
