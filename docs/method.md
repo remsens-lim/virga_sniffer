@@ -117,7 +117,6 @@ unusual combinations of low reflectivity while high falling speed hydro meteors 
 Therefore, [mask_vel](cfg_flag) and [mask_clutter](cfg_flag) can be used to explicitly mask a certain interval of interest of Doppler velocity or radar reflectivity for virga statistics.
 
 ## Output data
-The results of the virga and cloud detection are stored as boolean flags on same dimensions of the radar reflectivity input data in the output dataset. In addition, the processed cloud-base and 
--top heights are stored, as well as some basic characteristics as cloud and virga depth for each column.  
+The results of the virga and cloud detection are stored in an output dataset as boolean flags with the same dimensions as the radar reflectivity input data. In addition, the processed cloud-base and -top heights are stored, as well as some basic characteristics such as cloud and virga depth for each column.  
 For a detailed descriptions see [Output dataset](output). The output dataset has an implemented custom methods for plotting of the Virga-Sniffer output (*vsplot*). For a detailed description see 
 [Plotting](plotting).
