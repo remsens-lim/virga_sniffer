@@ -1,8 +1,8 @@
 # Data
 (input)=
 ## Input dataset
-The virga_sniffer virga detection method receives as bare minimum input the *radar reflectivity* and values of cloud-base height. Ancillary data is accepted (and highly recommended) to refine the 
-virga_detection. Optional input data are the *doppler velocity*, *rain at surface flag*, *lifting condensation level*. The input dataset has to be provided in the form of an 
+The Virga-Sniffer virga detection method receives as bare minimum input the *radar reflectivity* and values of cloud-base height. Ancillary data is accepted (and highly recommended) to refine the 
+virga detection. Optional input data are the *doppler velocity*, *rain at surface flag*, *lifting condensation level*. The input dataset has to be provided in the form of an 
 [xarray.Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html)
 (see e.g., [virga_mask](virga_detection)). In the following, the input 
 variables, their dimensions and purpose are described:
