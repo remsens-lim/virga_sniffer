@@ -13,7 +13,7 @@ The workflow of the detection scheme as summarized by the flowchart is structure
 
 ## Input data
 The Virga-Sniffer virga detection method receives as bare minimum input the *radar reflectivity* and values of *cloud-base height*. Ancillary data is accepted (and highly recommended) to refine the 
-virga detection. Optional input data are the *doppler velocity*, *rain at surface flag*, *lifting condensation level*. For a detailed descriptions see [Input dataset](input).
+virga detection. Optional input data are the *doppler velocity*, *rain at surface flag* and *lifting condensation level*. For a detailed descriptions see [Input dataset](input).
 
 (preprocessing)=
 ## Cloud-base preprocessing
@@ -31,8 +31,8 @@ module 4. The remaining processing steps are controlled with the configuration s
    ```
  - **4: smooth**: The CBH layer data is smoothed by applying a running-median window of the size [cbh_smooth_window](cfg_thres).
 
-After the all processing steps are applied, the processed CBH data is filled by interpolation according to the configuration [cbh_fill_limit](cfg_thres) and [cbh_fill_method](cfg_spec). This step 
-can be disabled either setting [cbh_fill_limit](cfg_thres) to 0 or [cbh_fill_method](cfg_spec) to None.
+After all processing steps are applied, the processed CBH data is filled by interpolation according to the configuration [cbh_fill_limit](cfg_thres) and [cbh_fill_method](cfg_spec). This step 
+can be disabled by either setting [cbh_fill_limit](cfg_thres) to 0 or [cbh_fill_method](cfg_spec) to None.
 
 (detection)=
 ## Precipitation & cloud detection
@@ -54,20 +54,19 @@ in this case assigned to the highest contiguous cloud base and associated cloud.
 The detected cloud-top values are smoothed as cloud-base values are smoothed prior to the cloud-base processing utilizing a rolling median filter of window size defined by the 
 [cbh_smooth_window](cfg_thres) threshold.
 
-After this processing step, an index mapping of CTH and CBH values to the upper edge of radar range-gate heights is conducted for further processing. This mapping used to separate the cloud- and 
+After this processing step, an index mapping of CTH and CBH values to the upper edge of radar range-gate heights is conducted for further processing. This mapping is used to separate the cloud- and 
 virga-mask into cloud layer components. 
 
 Until this point, the identification of clouds and precipitation is solely based on the input variables *cloud_base_height* and *Ze* (radar reflectivity). The virga mask is refined by optional 
-masking componentes, enabled via the configuration. The modules [mask_rain_ze](cfg_flag) and [minimum_rg_number](cfg_thres) can be used without the requirement of additional data. If one of *
-[mask_clutter](cfg_flag), [mask_vel](cfg_flag), 
+masking componentes, enabled via the configuration. The modules [mask_rain_ze](cfg_flag) and [minimum_rg_number](cfg_thres) can be used without the requirement of additional data. If one of [mask_clutter](cfg_flag), [mask_vel](cfg_flag), 
 [mask_rain](cfg_flag) is set in the configuration, additional data is required.
 
 ```{note}
-It is recommended to enable at least one of [mask_rain_ze](cfg_flag) and [mask_rain](cfg_flag), else the Virga-Sniffer turns into Precipitation-Sniffer.  Using [mask_rain_ze](cfg_flag), virga 
+It is recommended to enable at least one of [mask_rain_ze](cfg_flag) and [mask_rain](cfg_flag), else the Virga-Sniffer turns into a Precipitation-Sniffer.  Using [mask_rain_ze](cfg_flag), virga 
 detection can be done using only cloud-base height and radar reflectivity data.
 ```
 
-Virga and cloud detection is skeched in the {ref}`figure below <fig-sketch>`. Special cases are:
+Virga and cloud detection is sketched in the {ref}`figure below <fig-sketch>`. Special cases are:
  - **time = 2**: The gap (range-gate (rg) 7-8) is smaller than [virga_max_gap](cfg_thres) to count rg 6 as virga, but rg 6 is dropped due to [minimum_rangegate_number](cfg_thres)=2.
  - **time = 3**: The gap (rg 7-8) is smaller than [virga_max_gap](cfg_thres), therefore rg 3-6 are counted as virga.
  - **time = 4**: The gap (rg 7-11) is larger than [virga_max_gap](cfg_thres), therefore rg 3-6 are not counted as virga. In addition, the gap (rg 17-18) is larger than [ze_max_gap](cfg_thres), 
@@ -81,7 +80,7 @@ Example sketch of virga and cloud detection.
 ```
 
 ## Virga mask refinement
-The virga detection can be refined by enabling masking modules via the [Configuration](configuration), some of which require additional input data as doppler velocity or surface rain flag.
+The virga detection can be refined by enabling masking modules via the [Configuration](configuration), some of which require additional input data such as Doppler velocity or surface rain flag.
 In order to actually detect virga and exclude rain events, one of *mask_rain* or *mask_rain_ze* have to be enabled. Other optional modules refine the mask by excluding events with undesired 
 properties or clutter, so it's highly recommended to enable them.
 
