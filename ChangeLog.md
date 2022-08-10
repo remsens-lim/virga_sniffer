@@ -24,10 +24,10 @@
     * virga_depth_maximum_extend - like virga_depth, but including gaps (maximum geometric extend)
     * virga_top_height
     * virga_base_height
-    * cloud_top_rg - index of rangegate where cloud top is located
-    * cloud_base_rg  - index of rangegate where cloud base is located
-    * virga_top_rg - index of rangegate where virga top is located
-    * virga_base_rg  - index of rangegate where virga base is located
+    * cloud_top_rg - index of range gate where cloud top is located
+    * cloud_base_rg  - index of range gate where cloud base is located
+    * virga_top_rg - index of range gate where virga top is located
+    * virga_base_rg  - index of range gate where virga base is located
 * new example
   * Added interactive demonstration of virga_sniffer config as jupyter notebook
 * Changes in default configuration

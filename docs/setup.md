@@ -1,7 +1,7 @@
 # Setup
 ## Virga-Sniffer
 
-The Virga-Sniffer can be installed via pip and the github repository:
+The Virga-Sniffer can be installed via pip and the GitHub repository:
 ```
 python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer
 ```
@@ -102,7 +102,7 @@ This will install additionally:
  - ipywidgets
  - ipympl
 
-To run the demonstration of the virga-sniffer configuration, these files have to be downloaded from the repository:
+To run the demonstration of the Virga-Sniffer configuration, these files have to be downloaded from the repository:
  - [virga-sniffer_config_demo.ipynb](../example/virga-sniffer_config_demo.ipynb)
  - [vs_interactive.py](../example/vs_interactive.py)
  - [test_data](../example/test_data/2020-01-24_00_virga-sniffer_input.nc)

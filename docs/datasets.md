@@ -1,9 +1,8 @@
 # Data
 (input)=
 ## Input dataset
-The virga_sniffer virga detection method receives as bare minimum input the *radar reflectivity* and values of cloud-base height. Ancillary data is accepted (and highly recommended) to refine the 
-virga_detection. Optional input data are the *doppler velocity*, *rain at surface flag*, *lifting condensation level*. The input dataset has to be provided in the form of an 
-[xarray.Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html)
+The Virga-Sniffer virga detection method receives as bare minimum input the *radar reflectivity* and values of cloud-base height. Ancillary data is accepted (and highly recommended) to refine the 
+virga detection. Optional input data are the *doppler velocity*, *rain at surface flag*, *lifting condensation level*. The input dataset has to be provided in the form of a [xarray.Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html)
 (see e.g., [virga_mask](virga_detection)). In the following, the input 
 variables, their dimensions and purpose are described:
 
@@ -13,8 +12,8 @@ variables, their dimensions and purpose are described:
  - **dimensions**: (*time*, *range*)
  - **optional**: False
 
- *Ze* is used for basic precipitation and cloud detection. The *Ze* valid value mask (True if not nan-value) is used along with *cloud_base_height*. If [mask_rain_ze](cfg_flag) is True, value 
- of *Ze* at the lowest range-gate is compared to [ze_thres](cfg_thres). If [mask_clutter](cfg_flag) is True, *Ze* and *vel* are used to [refine the virga mask](mvel).
+ *Ze* is used for basic precipitation and cloud detection. The *Ze* valid value mask (True if not nan-value) is used along with *cloud_base_height*. If [mask_rain_ze](cfg_flag) is True, values 
+ of *Ze* at the lowest range-gate are compared to [ze_thres](cfg_thres). If [mask_clutter](cfg_flag) is True, *Ze* and *vel* are used to [refine the virga mask](mvel).
 ```{note}
 Actually the unit of *Ze* doesn't matter as long as [mask_rain_ze](cfg_flag) and [mask_clutter](cfg_flag) are False. Even if [mask_rain_ze](cfg_flag) is True, *Ze* is required to have the same 
 unit as [ze_thres](cfg_thres). If [mask_clutter](cfg_flag) is True, [clutter_m](cfg_thres) has to be carefully chosen in order to match the unit of *Ze*.
@@ -65,16 +64,15 @@ The lifting condensation level can be calculated from surface observations of ai
 
 (output)=
 ## Output dataset
-The results of the virga and cloud detection are stored as boolean flags on same dimensions of the radar reflectivity input data in the output dataset. In addition, the processed cloud-base and 
--top heights are stored, as well as some basic characteristics as cloud and virga depth for each column. The output is provided as
-[xarray.Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html) - names, units and description is provided in the following:
+The results of the virga and cloud detection are stored in the output dataset as boolean flags with the same dimensions as the radar reflectivity input data. In addition, the processed cloud-base and -top heights are stored, as well as some basic characteristics such as cloud and virga depth for each column. The output is provided as a
+[xarray.Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html) - names, units and description are provided in the following:
 
 ### Virga flag
  - **name**: *flag_virga*, *flag_virga_layer*
  - **units**: bool
  - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
 
-On the same dimensions as the input *Ze*, the boolean flags are True if virga is detected. In *flag_virga_layer*, the *flag_virga* mask is separated by each cloud layer, so that only virga 
+With the same dimensions as the input *Ze*, the boolean flags are True if virga is detected. In *flag_virga_layer*, the *flag_virga* mask is separated by each cloud layer, so that only virga 
 attached to the cloud base of the respective layer is True. 
 ```
 flag_virga = flag_virga.sum(axis=-1).astype(bool) 
@@ -85,7 +83,7 @@ flag_virga = flag_virga.sum(axis=-1).astype(bool)
  - **units**: bool
  - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
 
-Similar to the virga flag, these flags are True if clouds are detected.
+Similar to the virga flag, this flag is True if a cloud is detected.
 
 ### Virga depth
  - **name**: *virga_depth*, *virga_depth_maximum_extend*
@@ -93,8 +91,7 @@ Similar to the virga flag, these flags are True if clouds are detected.
  - **dimensions**: (*time*, *layer*)
 
 *virga_depth* and *virga_depth_maximum_extend* are measures of the vertical extend of the virga, but calculated differently. *virga_depth* denotes the sum of the vertical extend of all range-gates 
-where virga is detected, thus excluding gaps introduced by [virga_max_gap](cfg_thres). *virga_depth_maximum_extend* includes these gaps, by being calculated by ```virga_top_height - 
-virga_base_heigt```. Therefore, *virga_depth* should be used, when calculating volumetric characteristics, as the liquid water path, and *virga_depth_maximum_extend* for geometric characteristics.
+where virga is detected, thus excluding gaps introduced by [virga_max_gap](cfg_thres). *virga_depth_maximum_extend* includes these gaps, by being calculated by ```virga_top_height - virga_base_height```. Therefore, *virga_depth* should be used, when calculating volumetric characteristics, such as the liquid water path, and *virga_depth_maximum_extend* for geometric characteristics.
 
 ### Cloud depth
  - **name**: *cloud_depth*
