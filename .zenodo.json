@@ -1,0 +1,30 @@
+{
+  "title": "Virga-Sniffer",
+  "creators": [
+    {
+      "name": "Witthuhn, Jonas",
+      "orcid": "0000-0002-4818-5011",
+      "affiliation": "Leipzig Institute for Meteorology, University of Leipzig, Leipzig, Germany"
+    },
+    {
+      "name": "Röttenbacher, Johannes",
+      "orcid": "0000-0001-6205-6016",
+      "affiliation": "Leipzig Institute for Meteorology, University of Leipzig, Leipzig, Germany"
+    },
+    {
+      "name": "Kalesse-Los, Heike",
+      "orcid": "0000-0001-6699-7040",
+      "affiliation": "Leipzig Institute for Meteorology, University of Leipzig, Leipzig, Germany"
+    }
+  ],
+  "keywords": [
+    "virga",
+    "precipitation",
+    "cloud",
+    "radar",
+    "ceilometer"
+  ],
+  "grants": [
+    {"id": "232101675"}
+  ]
+}
