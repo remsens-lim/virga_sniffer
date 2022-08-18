@@ -305,7 +305,7 @@ class VirgaSnifferPlotAccessor:
         pl1 = ax.pcolormesh(self._time,
                             self._obj.range,
                             self._obj.Ze.values.T,
-                            cmap='jet', vmin=-60, vmax=20)
+                            cmap='jet', vmin=-40, vmax=20)
         self.plot_cbh(ax=ax, colorbar=False)
         ax.set_ylim([0, ylim])
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
@@ -316,7 +316,7 @@ class VirgaSnifferPlotAccessor:
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.grid(True)
 
-        ax.text(0.04,0.96,"Radar reflectivity factor",
+        ax.text(0.02,0.96,"Radar reflectivity factor",
                 fontsize=15,
                 ha="left", va="top",transform=ax.transAxes,
                 bbox=dict(facecolor='w',edgecolor='k',alpha=0.7))
@@ -371,7 +371,7 @@ class VirgaSnifferPlotAccessor:
         ax.set_xlabel('Time (UTC)', fontsize=15)
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.grid(True)
-        ax.text(0.04, 0.96, "Mean Doppler velocity",
+        ax.text(0.02, 0.96, "Mean Doppler velocity",
                 fontsize=15,
                 ha="left", va="top", transform=ax.transAxes,
                 bbox=dict(facecolor='w', edgecolor='k', alpha=0.7))
@@ -437,7 +437,7 @@ class VirgaSnifferPlotAccessor:
         ax.set_xlabel('Time (UTC)', fontsize=15)
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.grid(True)
-        ax.text(0.04, 0.96, "Virga-Sniffer Output",
+        ax.text(0.02, 0.96, "Virga-Sniffer Output",
                 fontsize=15,
                 ha="left", va="top", transform=ax.transAxes,
                 bbox=dict(facecolor='w', edgecolor='k', alpha=0.7))
@@ -476,7 +476,7 @@ class VirgaSnifferPlotAccessor:
         # axs[0].set_title(f"{stime:%d.%m.%Y %H:%M} UTC - {etime:%d.%m.%Y %H:%M} UTC",
         #                  fontsize=24, fontweight='bold')
         axs[0].set_title(f"{radar} {stime:%Y-%m-%d}",
-                         fontsize=24, fontweight='bold')
+                         fontsize=18)
         self.quicklook_ze(ax=axs[0],
                           ylim=ylim,
                           radar=radar)
