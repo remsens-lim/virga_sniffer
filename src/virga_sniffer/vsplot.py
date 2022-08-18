@@ -98,7 +98,7 @@ class VirgaSnifferPlotAccessor:
                               Z, levels, cmap=mcolors.ListedColormap(colors))
 
             cbar = plt.colorbar(pl1, ax=ax, fraction=0.13, pad=0.025)
-            cbar.ax.set_ylabel(f"cloud base/top layer [-]", fontsize=14)
+            cbar.ax.set_ylabel(f"cloud base/top layer number", fontsize=14)
             cbar.set_ticks(np.arange(len(colors)) + 0.5)
             cbar.ax.set_yticklabels(np.arange(len(colors)))
             cbar.ax.tick_params(axis='both', which='major', labelsize=14, width=2, length=4)
@@ -311,17 +311,22 @@ class VirgaSnifferPlotAccessor:
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
         ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
 
-        ax.set_ylabel('Altitude [km]', fontsize=15)
-        ax.set_xlabel('Time UTC', fontsize=15)
+        ax.set_ylabel('Height (km)', fontsize=15)
+        ax.set_xlabel('Time (UTC)', fontsize=15)
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.grid(True)
 
+        ax.text(0.04,0.96,"Radar reflectivity factor",
+                fontsize=15,
+                ha="left", va="top",transform=ax.transAxes,
+                bbox=dict(facecolor='w',edgecolor='k',alpha=0.7))
+
         # cax = ax1.inset_axes([1.04, 0.2, 0.05, 0.6], transform=ax1.transAxes)
         cbar = plt.colorbar(pl1, ax=ax, fraction=0.13, pad=0.025)
-        cbar.ax.set_ylabel(f"{radar} Ze [dBZ]", fontsize=14)
+        cbar.ax.set_ylabel(f"dBz", fontsize=14)
 
-        cbar.set_ticks(np.arange(-60, 30, 10))
-        cbar.ax.set_yticklabels(np.arange(-60, 30, 10))
+        cbar.set_ticks(np.arange(-40, 30, 10))
+        cbar.ax.set_yticklabels(np.arange(-40, 30, 10))
         cbar.ax.tick_params(axis='both', which='major', labelsize=14, width=2, length=4)
         cbar.ax.tick_params(axis='both', which='minor', width=2, length=3)
 
@@ -362,14 +367,18 @@ class VirgaSnifferPlotAccessor:
         ax.set_ylim([0, ylim])
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
         ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
-        ax.set_ylabel('Altitude [km]', fontsize=15)
-        ax.set_xlabel('Time UTC', fontsize=15)
+        ax.set_ylabel('Height (km)', fontsize=15)
+        ax.set_xlabel('Time (UTC)', fontsize=15)
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.grid(True)
+        ax.text(0.04, 0.96, "Mean Doppler velocity",
+                fontsize=15,
+                ha="left", va="top", transform=ax.transAxes,
+                bbox=dict(facecolor='w', edgecolor='k', alpha=0.7))
 
         # cax = ax1.inset_axes([1.04, 0.2, 0.05, 0.6], transform=ax1.transAxes)
         cbar = plt.colorbar(pl2, ax=ax, fraction=0.13, pad=0.025)
-        cbar.ax.set_ylabel(f"{radar} Mean Doppler Velocity [m/s]", fontsize=14)
+        cbar.ax.set_ylabel(f"m/s", fontsize=14)
         cbar.set_ticks(np.arange(-4, 4, 1))
         cbar.ax.set_yticklabels(np.arange(-4, 4, 1))
         cbar.ax.tick_params(axis='both', which='major', labelsize=14, width=2, length=4)
@@ -424,10 +433,14 @@ class VirgaSnifferPlotAccessor:
         ax.set_ylim([0, ylim])
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
         ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
-        ax.set_ylabel('Altitude [km]', fontsize=15)
-        ax.set_xlabel('Time UTC', fontsize=15)
+        ax.set_ylabel('Height (km)', fontsize=15)
+        ax.set_xlabel('Time (UTC)', fontsize=15)
         ax.tick_params(axis='both', which='major', labelsize=14)
         ax.grid(True)
+        ax.text(0.04, 0.96, "Virga-Sniffer Output",
+                fontsize=15,
+                ha="left", va="top", transform=ax.transAxes,
+                bbox=dict(facecolor='w', edgecolor='k', alpha=0.7))
 
     def quicklook_full(self,
                        axs=None,
@@ -460,9 +473,10 @@ class VirgaSnifferPlotAccessor:
 
         stime = pd.to_datetime(self._time.values[0])
         etime = pd.to_datetime(self._time.values[-1])
-        axs[0].set_title(f"{stime:%d.%m.%Y %H:%M} UTC - {etime:%d.%m.%Y %H:%M} UTC",
+        # axs[0].set_title(f"{stime:%d.%m.%Y %H:%M} UTC - {etime:%d.%m.%Y %H:%M} UTC",
+        #                  fontsize=24, fontweight='bold')
+        axs[0].set_title(f"{radar} {stime:%Y-%m-%d}",
                          fontsize=24, fontweight='bold')
-
         self.quicklook_ze(ax=axs[0],
                           ylim=ylim,
                           radar=radar)
@@ -474,7 +488,7 @@ class VirgaSnifferPlotAccessor:
 
         axs[0].set_xlabel("")
         axs[1].set_xlabel("")
-        axs[2].set_xlabel('Time UTC', fontsize=15)
+        axs[2].set_xlabel('Time (UTC)', fontsize=15)
         fig = axs[0].get_figure()
         fig.autofmt_xdate()
         return fig, axs
