@@ -23,8 +23,5 @@
     "cloud",
     "radar",
     "ceilometer"
-  ],
-  "grants": [
-    {"id": "232101675"}
   ]
 }
