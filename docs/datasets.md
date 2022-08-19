@@ -33,13 +33,13 @@ configuration setting  [cbh_smooth_window](cfg_thres) and [cbh_processing](cfg_s
 Cloud-base height preprocessing can be turned off by setting [cbh_smooth_window](cfg_thres) to 0 and [cbh_processing](cfg_spec) to [].
 ```
 
-### Doppler velocity
+### Mean Doppler velocity
  - **name**: *vel*
  - **units**: m s-1
  - **dimensions**: (*time*, *range*)
  - **optional**: True
 
-The doppler velocity is required only if at least on of  [mask_vel](cfg_flag) or [mask_clutter](cfg_flag) is True. This data is used for [virga mask refinement](mvel).
+The mean Doppler velocity is required only if at least on of  [mask_vel](cfg_flag) or [mask_clutter](cfg_flag) is True. This data is used for [virga mask refinement](mvel).
 
 ### Surface rain flag
  - **name**: *flag_surface_rain*

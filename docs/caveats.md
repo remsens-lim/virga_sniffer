@@ -1,5 +1,6 @@
 # Caveats
-The Virga-Sniffer is a column based detection scheme for virga events. The detection is strongly tuned and manually evaluated for best performance with the dataset (TODO:cite)
+The Virga-Sniffer is a column based detection scheme for virga events. The detection is strongly tuned and manually evaluated for best performance with the EUREC4A datasets 
+[LIMRAD94](https://www.doi.org/10.25326/164) and [Ceilometer](https://www.doi.org/10.25326/53).
 It relies on threshold based tests which might not work in other environments or with different input data setup. Some major caveats to have an eye on while using the Virga-Sniffer are outlined below:
 
 ```{figure} ../docs/images/vs_demonstration_maxgap_multilayer.jpg
