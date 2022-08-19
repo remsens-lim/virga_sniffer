@@ -11,16 +11,16 @@ Flags are boolean values which control certain functionality of the Virga-Sniffe
    ```{note}
    It is highly recommended to use **True** when working with multi-layer CBH, as gaps in ceilometer data are introduced by clouds in the lower layers. To circumvent the issue of ceilometer data gaps, one can adjust CBH-layer fill (*cbh_layer_fill_...*) thresholds.
    ```
- - **mask_vel = True**: If **True**, switches on the restriction of the virga mask to data points where the Doppler velocity is below the value of **vel_thres** threshold (see [Doppler velocity 
+ - **mask_vel = True**: If **True**, switches on the restriction of the virga mask to data points where the mean Doppler velocity is below the value of **vel_thres** threshold (see [mean Doppler velocity 
    based refinement](mvel)). Therefore if 
    **True**, 
-   the Doppler velocity (**vel**) has to be included in the input dataset. The default is **True**. 
+   the mean Doppler velocity (**vel**) has to be included in the input dataset. The default is **True**. 
  - **mask_clutter = True**: If **True**, switches on the restriction of the virga mask to data points where the following dependency is fulfilled:
    ```
    vel > -clutter_m * (Ze / 60 dBz) + clutter_c
    ```
-   where *vel* and *Ze* denotes the input Doppler velocity [ms-1] and radar reflectivity [dBz], respectively (see [Doppler velocity based refinement](mvel)). The default is **True**, therefore, 
-   the Doppler velocity (*vel*) has to be included in 
+   where *vel* and *Ze* denotes the input mean Doppler velocity [ms-1] and radar reflectivity [dBz], respectively (see [mean Doppler velocity based refinement](mvel)). The default is **True**, therefore, 
+   the mean Doppler velocity (*vel*) has to be included in 
    the input dataset.
  - **mask_rain = True**: If **True**, this flag switches on the use of the *flag_surface_rain* variable from the input dataset in order to consider virga only, if no rain is observed at the 
    surface. This is applied to the lowest present cloud layer at any given time. Therefore, higher layer virga events will not be masked if rain is detected at the surface.
@@ -30,13 +30,13 @@ Flags are boolean values which control certain functionality of the Virga-Sniffe
 (cfg_thres)=
 ## Thresholds
 Virga detection specific thresholds:
- - **minimum_rangegate_number = 2**:
+ - **minimum_rangegate_number = 2**: In case of non-continuous radar signal in a column, isolated contiguous range-gates with valid radar signal are used only if the number of range-gates is greater than this threshold.
  - **ze_max_gap = 150 m**: From each cloud-base layer, the detection of cloud advances upwards. Cloud-top heights are assigned below the first gap larger than **ze_max_gap**. The cloud mask is 
    always applied between cloud-base and detected cloud-top. The default value is 150m.
  - **virga_max_gap = 700 m**: From each cloud-base layer, the detection of virga advances downwards. Virga is detected until a gap (nan-value) of radar-reflectivity larger than **virga_max_gap** 
    occurs. The default value is 700m to also capture virga in fall streaks relatively far below the cloud base, but mask out any clutter or not identified cloud close to the surface or lower cloud 
    layer.
- - **vel_thres = 0 ms-1**: Defines the Doppler velocity threshold. If **vel_mask** is set to **True** (default), a datapoint is considered virga only if the Doppler velocity is below this threshold. 
+ - **vel_thres = 0 ms-1**: Defines the mean Doppler velocity threshold. If **vel_mask** is set to **True** (default), a datapoint is considered virga only if the mean Doppler velocity is below this threshold. 
    The 
    default value is 0 [ms-1], therefore only falling hydrometeors are considered virga.
  - **ze_thres = 0 dBz**: This threshold is applied if **mask_rain_ze = True**. If the value of radar reflectivity of the lowest range is larger than **ze_thres**, precipitation is assumed to reach 
