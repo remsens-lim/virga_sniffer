@@ -1,7 +1,7 @@
 # Virga-Sniffer
 The Virga-Sniffer is a tool to detect *virga* (precipitation which completely evaporates before reaching the surface).
 As input source **radar reflectivity** and **ceilometer cloud-base height** observation are mandatory.
-Optionally but highly recommended are the additional information of **radar Doppler velocity**, **lifting condensation level** and **surface rain detection**.
+Optionally but highly recommended are the additional information of **mean Doppler velocity**, **lifting condensation level** and **surface rain detection**.
 
 # Documentation
 The documentation is hosted at [readthedocs](https://virga-sniffer.readthedocs.io/en/latest/index.html).
