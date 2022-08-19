@@ -22,6 +22,10 @@
     "precipitation",
     "cloud",
     "radar",
-    "ceilometer"
+    "ceilometer",
+    "eurec4a"
+  ],
+  "related_identifiers": [
+    {"relation": "isDocumentedBy", "identifier": "https://virga-sniffer.readthedocs.io/"}
   ]
 }
