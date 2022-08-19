@@ -1,6 +1,6 @@
 # Method description
 The Virga-Sniffer is a tool to detect *virga* (precipitation which completely evaporates before reaching the surface).
-As input source **radar reflectivity** and ceilometer **cloud-base height** observations are mandatory. Optionally but highly recommended are the additional information of **radar Doppler 
+As input source **radar reflectivity** and ceilometer **cloud-base height** observations are mandatory. Optionally but highly recommended are the additional information of **radar mean Doppler 
 velocity**, **lifting condensation level** and **surface rain detection**.
 
 The workflow of the detection scheme as summarized by the flowchart is structured in three parts:
@@ -8,12 +8,14 @@ The workflow of the detection scheme as summarized by the flowchart is structure
  2. Baseline precipitation and cloud detection
  3. (Optional) Virga detection refinement
 
-```{figure} images/flowchart.svg
+```{figure} images/flowchart.png
+The workflow of the Virga-Sniffer virga detection. Datasets are shown as polygons, applied methods as ellipses. The submodule cbh_processing is shown as square, listing implemented methods. (Ze - 
+radar reflectivity; Vm - mean Doppler velocity; CBH - cloud base height; CTH cloud top height; LCL - lifting condensation level) 
 ```
 
 ## Input data
 The Virga-Sniffer virga detection method receives as bare minimum input the *radar reflectivity* and values of *cloud-base height*. Ancillary data is accepted (and highly recommended) to refine the 
-virga detection. Optional input data are the *Doppler velocity*, *rain at surface flag* and *lifting condensation level*. For a detailed descriptions see [Input dataset](input).
+virga detection. Optional input data are the *mean Doppler velocity*, *rain at surface flag* and *lifting condensation level*. For a detailed descriptions see [Input dataset](input).
 
 (preprocessing)=
 ## Cloud-base preprocessing
@@ -76,11 +78,11 @@ Virga and cloud detection is sketched in the {ref}`figure below <fig-sketch>`. S
 
 ```{figure} images/example_detection.png
 :name: fig-sketch
-Example sketch of virga and cloud detection. 
+Sketched representation of virga and cloud detection from radar reflectivity Ze, surface rain flag and cloud base height data. 
 ```
 
 ## Virga mask refinement
-The virga detection can be refined by enabling masking modules via the [Configuration](configuration), some of which require additional input data such as Doppler velocity or surface rain flag.
+The virga detection can be refined by enabling masking modules via the [Configuration](configuration), some of which require additional input data such as mean Doppler velocity or surface rain flag.
 In order to actually detect virga and exclude rain events, one of *mask_rain* or *mask_rain_ze* have to be enabled. Other optional modules refine the mask by excluding events with undesired 
 properties or clutter, so it's highly recommended to enable them.
 
@@ -99,22 +101,22 @@ If [minimum_rangegate_number](cfg_thres) is set to a value larger than zero (def
 virga mask (see {ref}`this figure <fig-sketch>`)
 
 (mvel)=
-### Doppler velocity based refinement
-If the Doppler velocity is provided in the input data  [mask_vel](cfg_flag) and [mask_clutter](cfg_flag) can be enabled. While [mask_vel](cfg_flag) can be used to restrict virga to only falling 
+### Mean Doppler velocity based refinement
+If the mean Doppler velocity is provided in the input data  [mask_vel](cfg_flag) and [mask_clutter](cfg_flag) can be enabled. While [mask_vel](cfg_flag) can be used to restrict virga to only falling 
 droplets (with default [vel_thres](cfg_thres)=0), [mask_clutter](cfg_flag) restricts virga to datapoints fulfilling:
 ```
 vel > -clutter_m * (Ze / 60 dBz) + clutter_c
 ```
-where *vel* and *Ze* denotes the input Doppler velocity [ms-1] and radar reflectivity [dBz], respectively.
+where *vel* and *Ze* denotes the input mean Doppler velocity [ms-1] and radar reflectivity [dBz], respectively.
 For convenience, the reflectivity is scaled by 60 dBz (as -60dBz is minimum valid value of *LIMRAD94*). The values [clutter_m](cfg_thres) [ms-1] and [clutter_c](cfg_thres) [ms-1] are slope and 
 intercept of the threshold line. A data point is considered virga, only if the above equation is fulfilled.With default configuration ([clutter_m](cfg_thres) = 4 and [clutter_c](cfg_thres) =  -8) 
 unusual combinations of low reflectivity while high falling speed hydro meteors are dropped (see {ref}`figure below <fig-ze-vs-vel>`). 
 ```{figure} ../docs/images/vs_demonstration_ze_vs_vel.png
 :name: fig-ze-vs-vel
-2D-Histrogram of radar reflectivity and Doppler velocity of LIMRAD94 on RV-Meteor at EUREC4A campaign at 2020-01-17. Red shaded areas show, when virga is not considered due to **mask_vel** and 
+2D-Histrogram of radar reflectivity and mean Doppler velocity of LIMRAD94 on RV-Meteor at EUREC4A campaign at 2020-01-17. Red shaded areas show, when virga is not considered due to **mask_vel** and 
 **mask_clutter** using the default configuration of **vel_thres=0**, **clutter_m=4** and **clutter_c=-8**.
 ```
-Therefore, [mask_vel](cfg_flag) and [mask_clutter](cfg_flag) can be used to explicitly mask a certain interval of interest of Doppler velocity or radar reflectivity for virga statistics.
+Therefore, [mask_vel](cfg_flag) and [mask_clutter](cfg_flag) can be used to explicitly mask a certain interval of interest of mean Doppler velocity or radar reflectivity for virga statistics.
 
 ## Output data
 The results of the virga and cloud detection are stored in an output dataset as boolean flags with the same dimensions as the radar reflectivity input data. In addition, the processed cloud-base and -top heights are stored, as well as some basic characteristics such as cloud and virga depth for each column.  
