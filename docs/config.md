@@ -30,7 +30,7 @@ Flags are boolean values which control certain functionality of the Virga-Sniffe
 (cfg_thres)=
 ## Thresholds
 Virga detection specific thresholds:
- - **minimum_rangegate_number = 2**:
+ - **minimum_rangegate_number = 2**: In case of non-continuous radar signal in a column, isolated contiguous range-gates with valid radar signal are used only if the number of range-gates is greater than this threshold.
  - **ze_max_gap = 150 m**: From each cloud-base layer, the detection of cloud advances upwards. Cloud-top heights are assigned below the first gap larger than **ze_max_gap**. The cloud mask is 
    always applied between cloud-base and detected cloud-top. The default value is 150m.
  - **virga_max_gap = 700 m**: From each cloud-base layer, the detection of virga advances downwards. Virga is detected until a gap (nan-value) of radar-reflectivity larger than **virga_max_gap** 
