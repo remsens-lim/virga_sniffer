@@ -1,3 +1,7 @@
+[![DOI](https://zenodo.org/badge/468340916.svg)](https://zenodo.org/badge/latestdoi/468340916)
+[![Documentation Status](https://readthedocs.org/projects/virga-sniffer/badge/?version=latest)](https://virga-sniffer.readthedocs.io/en/latest/?badge=latest)
+
+
 # Virga-Sniffer
 The Virga-Sniffer is a tool to detect *virga* (precipitation which completely evaporates before reaching the surface).
 As input source **radar reflectivity** and **ceilometer cloud-base height** observation are mandatory.
