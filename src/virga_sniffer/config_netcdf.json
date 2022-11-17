@@ -73,6 +73,10 @@
   "flag_lowest_rg_rain": {
     "note": "True if rain is detected at the lowest radar range-gate."
   },
+  "number_cloud_layer": {
+    "units": "-",
+    "note": "Number of detected cloud layers at given time-step."
+  },
   "vel": {
     "long_name": "radar doppler velocity",
     "units": "ms-1"

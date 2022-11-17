@@ -330,13 +330,21 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                 virga_depth_rgedge[itime, ilayer] = rgtop[ivirgatop] - rgbase[ivirgabase]
                 virga_depth_nogap[itime, ilayer] = np.sum(rgtop[ivirga] - rgbase[ivirga])
 
+    # calculate cloud depth
+    cloud_depth = (cth - cbh).data
+    # if cloud_depth is unphysical or zero, set it to nan
+    cloud_depth[cloud_depth <= 0] = np.nan
+
+    # flag extensions
+    number_cloud_layers = np.count_nonzero(~np.isnan(cloud_depth), axis=1)
+
     output_dataset = xr.Dataset({"flag_virga": (('time', 'range'), vmask),
                                  "flag_virga_layer": (('time', 'range', 'layer'), vmask_layer),
                                  "flag_cloud": (('time', 'range'), cmask),
                                  "flag_cloud_layer": (('time', 'range', 'layer'), cmask_layer),
                                  "virga_depth": (('time', 'layer'), virga_depth_nogap),
                                  "virga_depth_maximum_extend": (('time', 'layer'), virga_depth_rgedge),
-                                 "cloud_depth": (('time', 'layer'), (cth - cbh).data),
+                                 "cloud_depth": (('time', 'layer'), cloud_depth),
                                  "virga_top_rg": (('time', 'layer'), idxs_vth),
                                  "virga_base_rg": (('time', 'layer'), idxs_vbh),
                                  "cloud_top_rg": (('time', 'layer'), idxs_cth),
@@ -350,7 +358,8 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                                  'flag_lcl_filled': ('time', idx_lcl),
                                  'flag_cbh_interpolated': (('time', 'layer'), idx_fill),
                                  'flag_surface_rain': ('time', output_rainflag_surface),
-                                 'flag_lowest_rg_rain': ('time', output_rainflag_lowestrg)},
+                                 'flag_lowest_rg_rain': ('time', output_rainflag_lowestrg),
+                                 'number_cloud_layer': ('time', number_cloud_layers)},
                                 coords={'range_top': ('range', rgtop),
                                         'range_base': ('range', rgbase)})
 
