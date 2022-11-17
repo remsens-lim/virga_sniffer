@@ -68,7 +68,10 @@
     "note": "True if CBH value is interpolated and not observed"
   },
   "flag_surface_rain": {
-    "note": "True if rain is detected at surface"
+    "note": "True if rain is detected at surface."
+  },
+  "flag_lowest_rg_rain": {
+    "note": "True if rain is detected at the lowest radar range-gate."
   },
   "vel": {
     "long_name": "radar doppler velocity",

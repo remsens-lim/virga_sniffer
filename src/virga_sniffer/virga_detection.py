@@ -274,7 +274,9 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         # Use ancillary rain sensor data to remove detected virga if rain
         # is observed at surface.
         # Apply only to lowest range-gate
-        vmask_layer[:, :, 0] *= _expand_mask(~ds.flag_surface_rain.values, vmask.shape[1])  # True if no rain at sfc
+        norainmask = ~ds.flag_surface_rain.values # True if no rain at sfc
+        norainmask += ~vmask[:, 0] # only apply rainmask if there is actually precip until the lowest rg
+        vmask_layer[:, :, 0] *= _expand_mask(norainmask, vmask.shape[1])  # True if no rain at sfc
         for ilayer in range(1,cbh.shape[1]):
             layerrainmask = (ds.flag_surface_rain.values)*(idxs_cbh[:,ilayer-1] == -1)
             vmask_layer[:, :, ilayer] *= _expand_mask(~layerrainmask, vmask.shape[1])  # True if no rain at sfc
@@ -285,11 +287,14 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         # Apply only to lowest range-gate
         ze_threshold = ds.Ze.values[:, 0] < config['ze_thres']
         ze_threshold += np.isnan(ds.Ze.values[:, 0])  # add nans again
+        ze_threshold += ~vmask[:, 0] # only apply rainmask if there is actually precip until the lowest rg
         vmask_layer[:, :, 0] *= _expand_mask(ze_threshold, vmask.shape[1])
         for ilayer in range(1,cbh.shape[1]):
             layerrainmask = (~ze_threshold)*(idxs_cbh[:,ilayer-1] == -1)
             vmask_layer[:, :, ilayer] *= _expand_mask(~layerrainmask, vmask.shape[1])  # True if no rain at sfc
 
+    
+    
     # Merge layered masks again
     vmask = np.sum(vmask_layer, axis=-1).astype(bool)
     cmask = np.sum(cmask_layer, axis=-1).astype(bool)
@@ -298,6 +303,12 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     # Prepare Output
     # --------------
     # assign additional layer infos
+    output_rainflag_surface = np.full(ds.Ze.time.size,False)
+    if config['mask_rain']:
+        output_rainflag_surface += ds.flag_surface_rain.values
+    output_rainflag_lowestrg = np.full(ds.Ze.time.size,False)
+    if config['mask_rain_ze']:
+        output_rainflag_lowestrg += ds.Ze.values[:, 0]>config['ze_thres']
     virga_depth_rgmid = np.zeros(cbh.shape)
     virga_depth_rgedge = np.zeros(cbh.shape)
     virga_depth_nogap = np.zeros(cbh.shape)
@@ -338,7 +349,8 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                                  'vel': ds.vel,
                                  'flag_lcl_filled': ('time', idx_lcl),
                                  'flag_cbh_interpolated': (('time', 'layer'), idx_fill),
-                                 'flag_surface_rain': ds.flag_surface_rain},
+                                 'flag_surface_rain': ('time', output_rainflag_surface),
+                                 'flag_lowest_rg_rain': ('time', output_rainflag_lowestrg)},
                                 coords={'range_top': ('range', rgtop),
                                         'range_base': ('range', rgbase)})
 
