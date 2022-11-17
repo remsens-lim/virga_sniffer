@@ -4,6 +4,7 @@ vsplot.py
 Methods for plotting Virga-Sniffer output, in the form of xarray dataset accessor "vsplot".
 
 """
+from typing import Tuple, Any
 
 import xarray as xr
 import numpy as np
@@ -33,11 +34,12 @@ class VirgaSnifferPlotAccessor:
                  lcl=True,
                  fill=True,
                  colorbar=True,
+                 fontsize=None,
                  # color_lcl = "#beaed4",
                  label_lcl="LCL from sfc-obs",
                  # color_fill = "#984ea3",
                  label_fill="cloud base interpolated",
-                 ) -> None:
+                 ) -> tuple[Any, Any]:
         """
         Plot all cloud layer related output: cloud-base height, cloud-top height, lifitng-condensation-level,
          and filled layer.
@@ -59,6 +61,8 @@ class VirgaSnifferPlotAccessor:
             Plot filled/interpolated data of cloud-base heights if True. The default is True.
         colorbar: bool, optional
             Add a colorbar to `ax` if True. The default is True.
+        fontsize: dict, optional
+            Configuration of fontsizes. Keywords and Defaults: "cbar_label"=16, "cbar_ticklabel"=14
         label_lcl: str, optional
             Label of lifing-condensation level. The default is "LCL from sfc-obs".
         label_fill: str, optional
@@ -66,9 +70,17 @@ class VirgaSnifferPlotAccessor:
 
         Returns
         -------
-        None
+        matplotlib.axes.Axes, matplotlib.colorbar.Colorbar
 
         """
+        fontsize_default = dict(
+            cbar_label=16,
+            cbar_ticklabel=14,
+        )
+        if fontsize is None:
+            fontsize = fontsize_default
+        fontsize = {**fontsize_default, **fontsize}
+
         if ax is None:
             ax = plt.gca()
         if colors is None:
@@ -98,10 +110,11 @@ class VirgaSnifferPlotAccessor:
                               Z, levels, cmap=mcolors.ListedColormap(colors))
 
             cbar = plt.colorbar(pl1, ax=ax, fraction=0.13, pad=0.025)
-            cbar.ax.set_ylabel(f"cloud base/top layer number", fontsize=14)
+            cbar.ax.set_ylabel(f"cloud base/top layer number", fontsize=fontsize['cbar_label'])
             cbar.set_ticks(np.arange(len(colors)) + 0.5)
             cbar.ax.set_yticklabels(np.arange(len(colors)))
-            cbar.ax.tick_params(axis='both', which='major', labelsize=14, width=2, length=4)
+            cbar.ax.tick_params(axis='both', which='major',
+                                labelsize=fontsize['cbar_ticklabel'], width=2, length=4)
             cbar.ax.tick_params(axis='both', which='minor', width=2, length=3)
 
         idx_fill = self._obj.flag_cbh_interpolated.values
@@ -151,6 +164,10 @@ class VirgaSnifferPlotAccessor:
                         color=colors[ilayer],
                         linestyle=':',
                         label=label_fill if ilayer == 0 else "")
+        if colorbar:
+            return ax, cbar
+        else:
+            return ax, 0
 
     def plot_flag_virga(self,
                         ax=None,
@@ -167,7 +184,7 @@ class VirgaSnifferPlotAccessor:
 
         Returns
         -------
-        None
+        matplotlib.axes.Axes
 
         """
         if ax is None:
@@ -182,6 +199,7 @@ class VirgaSnifferPlotAccessor:
                     levels=1,
                     colors=[color],
                     alpha=0.8)
+        return ax
 
     def plot_flag_cloud(self,
                         ax=None,
@@ -198,7 +216,7 @@ class VirgaSnifferPlotAccessor:
 
          Returns
          -------
-         None
+         matplotlib.axes.Axes
 
          """
 
@@ -214,6 +232,7 @@ class VirgaSnifferPlotAccessor:
                     levels=1,
                     colors=[color],
                     alpha=0.8)
+        return ax
 
     def plot_flag_ze(self,
                      ax=None,
@@ -230,7 +249,7 @@ class VirgaSnifferPlotAccessor:
 
          Returns
          -------
-         None
+         matplotlib.axes.Axes
 
          """
         if ax is None:
@@ -243,11 +262,13 @@ class VirgaSnifferPlotAccessor:
                     plt_radar.T,
                     levels=1,
                     colors=[color])
+        return ax
 
-    def plot_flag_surface_rain(self,
-                               ax=None,
-                               scale=None,
-                               color="k"):
+    def plot_flag_rain(self,
+                       ax=None,
+                       scale=None,
+                       fontsize=None,
+                       color="k"):
         """
          Plot rain at surface flag.
 
@@ -257,28 +278,42 @@ class VirgaSnifferPlotAccessor:
              The axes to assign the lines. If None uses matplotlib.pyplot.gca().
          scale: float, optional
              Scaling the flag value, e.g. set maximum. The default is 0.9*min(output.range).
+         fontsize: dict, optional
+             Configuration of fontsizes. Keywords and Defaults: "legend"=16
          color: str, optional
              Matplotlib color, the default is "k.
 
          Returns
          -------
-         None
-
+         matplotlib.axes.Axes
          """
+        fontsize_default = dict(
+            legend=16,
+        )
+        if fontsize is None:
+            fontsize = fontsize_default
+        fontsize = {**fontsize_default, **fontsize}
         if ax is None:
             ax = plt.gca()
         if scale is None:
             scale = self._obj.range.values[0] * 0.9
 
         ax.axhline(scale, color=(0.3, 0.3, 0.3), linestyle=':', linewidth=1)
-        ax.text(self._time[0], 0, "flag_rain", fontsize=12)
-        ax.fill_between(self._time,
-                        self._obj.flag_surface_rain.values * scale, color=color)
+        # ax.text(self._time[0], 0, "flag_rain", fontsize=fontsize['legend'])
+        ax.text(0.005, 0.01, "Rain flag:",
+                fontsize=fontsize['legend'],
+                ha="left", va="bottom", transform=ax.transAxes,
+                bbox=dict(facecolor='w', edgecolor='k', alpha=0.7,boxstyle="Square, pad=0.1"))
+        rainflag = self._obj.flag_surface_rain.values
+        rainflag += self._obj.flag_lowest_rg_rain.values
+        ax.fill_between(self._time, rainflag*scale, ec=color,hatch='.')
+        return ax
 
     def quicklook_ze(self,
                      ax=None,
                      ylim=None,
-                     radar='LIMRAD94'):
+                     fontsize=None,
+                     rasterized=True):
         """
          Plot formatted quicklook of radar reflectivity.
 
@@ -288,14 +323,27 @@ class VirgaSnifferPlotAccessor:
              The axes to assign the lines. If None uses matplotlib.pyplot.gca().
          ylim: float, optional
              Limit y-axis to altitude [m]. The default is np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3.
-         radar: str, optional
-             Add radar name to colobar label, the default is "LIMRAD94".
+         fontsize: dict, optional
+            Configuration of fontsizes. Keywords and Defaults: "ax_label"=16, "ax_ticklabel"=14, "cbar_label"=16,
+            "cbar_ticklabel"=14
+         rasterized: bool, optional
+            Turn on rasterization of matplotlib.pyplot.pcolormesh. The default is True.
 
          Returns
          -------
-         None
+         matplotlib.axes.Axes, matplotlib.colorbar.Colorbar
 
          """
+        fontsize_default = dict(
+            ax_label=16,
+            ax_ticklabel=14,
+            cbar_label=16,
+            cbar_ticklabel=14,
+        )
+        if fontsize is None:
+            fontsize = fontsize_default
+        fontsize = {**fontsize_default, **fontsize}
+
         if ax is None:
             ax = plt.gca()
         if ylim is None:
@@ -305,35 +353,39 @@ class VirgaSnifferPlotAccessor:
         pl1 = ax.pcolormesh(self._time,
                             self._obj.range,
                             self._obj.Ze.values.T,
-                            cmap='jet', vmin=-40, vmax=20)
+                            cmap='jet', vmin=-40, vmax=20,
+                            rasterized=rasterized)
         self.plot_cbh(ax=ax, colorbar=False)
         ax.set_ylim([0, ylim])
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
         ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
 
-        ax.set_ylabel('Height (km)', fontsize=15)
-        ax.set_xlabel('Time (UTC)', fontsize=15)
-        ax.tick_params(axis='both', which='major', labelsize=14)
+        ax.set_ylabel('Height (km)', fontsize=fontsize['ax_label'])
+        ax.set_xlabel('Time (UTC)', fontsize=fontsize['ax_label'])
+        ax.tick_params(axis='both', which='major', labelsize=fontsize['ax_ticklabel'])
         ax.grid(True)
 
         ax.text(0.02,0.96,"Radar reflectivity factor",
-                fontsize=15,
+                fontsize=fontsize['legend'],
                 ha="left", va="top",transform=ax.transAxes,
                 bbox=dict(facecolor='w',edgecolor='k',alpha=0.7))
 
-        # cax = ax1.inset_axes([1.04, 0.2, 0.05, 0.6], transform=ax1.transAxes)
         cbar = plt.colorbar(pl1, ax=ax, fraction=0.13, pad=0.025)
-        cbar.ax.set_ylabel(f"dBz", fontsize=14)
+        cbar.ax.set_ylabel(f"dBz", fontsize=fontsize['cbar_label'])
 
         cbar.set_ticks(np.arange(-40, 30, 10))
         cbar.ax.set_yticklabels(np.arange(-40, 30, 10))
-        cbar.ax.tick_params(axis='both', which='major', labelsize=14, width=2, length=4)
+        cbar.ax.tick_params(axis='both', which='major',
+                            labelsize=fontsize['cbar_ticklabel'],
+                            width=2, length=4)
         cbar.ax.tick_params(axis='both', which='minor', width=2, length=3)
+        return ax,cbar
 
     def quicklook_vel(self,
                       ax=None,
                       ylim=None,
-                      radar='LIMRAD94'):
+                      fontsize=None,
+                      rasterized=True):
         """
          Plot formatted quicklook of radar doppler velocity.
 
@@ -343,14 +395,27 @@ class VirgaSnifferPlotAccessor:
              The axes to assign the lines. If None uses matplotlib.pyplot.gca().
          ylim: float, optional
              Limit y-axis to altitude [m]. The default is np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3.
-         radar: str, optional
-             Add radar name to colobar label, the default is "LIMRAD94".
-
+         fontsize: dict, optional
+            Configuration of fontsizes. Keywords and Defaults: "legend"=16, "ax_label"=16, "ax_ticklabel"=14,
+            "cbar_label"=16, "cbar_ticklabel"=14
+         rasterized: bool, optional
+            Turn on rasterization of matplotlib.pyplot.pcolormesh. The default is True.
          Returns
          -------
-         None
+         matplotlib.axes.Axes, matplotlib.colorbar.Colorbar
 
          """
+        fontsize_default = dict(
+            legend=16,
+            ax_label=16,
+            ax_ticklabel=14,
+            cbar_label=16,
+            cbar_ticklabel=14,
+        )
+        if fontsize is None:
+            fontsize = fontsize_default
+        fontsize = {**fontsize_default, **fontsize}
+
         if ax is None:
             ax = plt.gca()
         if ylim is None:
@@ -361,32 +426,38 @@ class VirgaSnifferPlotAccessor:
                             self._obj.range,
                             self._obj.vel.values.T,
                             cmap='jet',
-                            vmin=-4, vmax=3)
-        self.plot_cbh(ax=ax, colorbar=False)
+                            vmin=-4, vmax=3,
+                            rasterized=rasterized)
+        self.plot_cbh(ax=ax, fontsize=fontsize, colorbar=False)
 
         ax.set_ylim([0, ylim])
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
         ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
-        ax.set_ylabel('Height (km)', fontsize=15)
-        ax.set_xlabel('Time (UTC)', fontsize=15)
-        ax.tick_params(axis='both', which='major', labelsize=14)
+        ax.set_ylabel('Height (km)', fontsize=fontsize['ax_label'])
+        ax.set_xlabel('Time (UTC)', fontsize=fontsize['ax_label'])
+        ax.tick_params(axis='both', which='major', labelsize=fontsize['ax_ticklabel'])
         ax.grid(True)
         ax.text(0.02, 0.96, "Mean Doppler velocity",
-                fontsize=15,
+                fontsize=fontsize['legend'],
                 ha="left", va="top", transform=ax.transAxes,
                 bbox=dict(facecolor='w', edgecolor='k', alpha=0.7))
 
         # cax = ax1.inset_axes([1.04, 0.2, 0.05, 0.6], transform=ax1.transAxes)
         cbar = plt.colorbar(pl2, ax=ax, fraction=0.13, pad=0.025)
-        cbar.ax.set_ylabel(f"m/s", fontsize=14)
+        cbar.ax.set_ylabel(f"m/s", fontsize=fontsize['cbar_label'])
         cbar.set_ticks(np.arange(-4, 4, 1))
         cbar.ax.set_yticklabels(np.arange(-4, 4, 1))
-        cbar.ax.tick_params(axis='both', which='major', labelsize=14, width=2, length=4)
+        cbar.ax.tick_params(axis='both', which='major', labelsize=fontsize['cbar_ticklabel'], width=2, length=4)
         cbar.ax.tick_params(axis='both', which='minor', width=2, length=3)
+        return ax, cbar
 
     def quicklook_flag_virga(self,
                              ax=None,
-                             ylim=None, legend=True):
+                             ylim=None,
+                             legend=True,
+                             fontsize=None,
+                             plot_flags=None,
+                            ):
         """
          Plot formatted quicklook of virga-sniffer output.
 
@@ -398,12 +469,38 @@ class VirgaSnifferPlotAccessor:
              Limit y-axis to altitude [m]. The default is np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3.
          legend: bool, optional
              If True add legend to plot. The default is True.
+         fontsize: dict, optional
+             Configuration of fontsizes. Keywords and Defaults: "legend"=16, "ax_label"=16, "ax_ticklabel"=14,
+             "cbar_label"=16, "cbar_ticklabel"=14
+         plot_flags: dict, optional
+             Components to plot. Keywords and Defaults: "ze"=True, "virga"=True, "cloud"=True, "rainflag"=True
 
          Returns
          -------
-         None
+         matplotlib.axes.Axes, matplotlib.colorbar.Colorbar
 
          """
+        plot_flags_default = dict(
+            ze=True,
+            virga=True,
+            cloud=True,
+            rainflag=True,
+        )
+        fontsize_default = dict(
+            legend=16,
+            ax_label=16,
+            ax_ticklabel=14,
+            cbar_label=16,
+            cbar_ticklabel=14,
+        )
+        if fontsize is None:
+            fontsize = fontsize_default
+        if plot_flags is None:
+            plot_flags = plot_flags_default
+
+        fontsize = {**fontsize_default, **fontsize}
+        plot_flags = {**plot_flags_default, **plot_flags}
+
         if ax is None:
             ax = plt.gca()
         if ylim is None:
@@ -411,11 +508,16 @@ class VirgaSnifferPlotAccessor:
             # add one km to make room for legends
             ylim = (1. + np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3)) * 1e3
 
-        self.plot_flag_ze(ax=ax)
-        self.plot_flag_virga(ax=ax)
-        self.plot_flag_cloud(ax=ax)
-        self.plot_cbh(ax=ax)
-        self.plot_flag_surface_rain(ax=ax)
+        if plot_flags['ze']:
+            self.plot_flag_ze(ax=ax)
+        if plot_flags['virga']:
+            self.plot_flag_virga(ax=ax)
+        if plot_flags['cloud']:
+            self.plot_flag_cloud(ax=ax)
+        if plot_flags['rainflag']:
+            self.plot_flag_rain(ax=ax,fontsize=fontsize)
+        ax, cbar = self.plot_cbh(ax=ax,fontsize=fontsize)
+        
         if legend:
             virga_patch = mpatches.Patch(color="#fb9a99", label='flag_virga')
             cloud_patch = mpatches.Patch(color="#a6cee3", label='flag_cloud')
@@ -428,24 +530,27 @@ class VirgaSnifferPlotAccessor:
                        radar_patch, virga_patch, cloud_patch],
                       ['cloud-base', 'cloud-top', 'filled cloud-base',
                        'radar-signal', 'flag_virga', 'flag_cloud'],
-                      fontsize=14,
+                      fontsize=fontsize['legend'],
                       ncol=2)
         ax.set_ylim([0, ylim])
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
         ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
-        ax.set_ylabel('Height (km)', fontsize=15)
-        ax.set_xlabel('Time (UTC)', fontsize=15)
-        ax.tick_params(axis='both', which='major', labelsize=14)
+        ax.set_ylabel('Height (km)', fontsize=fontsize['ax_label'])
+        ax.set_xlabel('Time (UTC)', fontsize=fontsize['ax_label'])
+        ax.tick_params(axis='both', which='major', labelsize=fontsize['ax_ticklabel'])
         ax.grid(True)
-        ax.text(0.02, 0.96, "Virga-Sniffer Output",
-                fontsize=15,
+        ax.text(0.02, 0.96, "Virga-Sniffer output",
+                fontsize=fontsize['legend'],
                 ha="left", va="top", transform=ax.transAxes,
                 bbox=dict(facecolor='w', edgecolor='k', alpha=0.7))
+        return ax,cbar
 
     def quicklook_full(self,
                        axs=None,
                        ylim=None,
-                       radar='LIMRAD94'):
+                       radar='LIMRAD94',
+                       fontsize=None,
+                       plot_flags=None):
         """
          3-Panel combined formatted quicklook of radar reflectivity, doppler velocity and virga-sniffer output.
 
@@ -457,12 +562,39 @@ class VirgaSnifferPlotAccessor:
              Limit y-axis to altitude [m]. The default is np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3.
          radar: str, optional
              Add radar name to colobar label, the default is "LIMRAD94".
+         fontsize: dict, optional
+             Configuration of fontsizes. Keywords and Defaults: "title"=18, "legend"=16, "ax_label"=16,
+             "ax_ticklabel"=14, "cbar_label"=16, "cbar_ticklabel"=14
+         plot_flags: dict, optional
+             Components to plot. Keywords and Defaults: "ze"=True, "virga"=True, "cloud"=True, "rainflag"=True
 
          Returns
          -------
-         None
+         matplotlib.figure.Figure, matplotlib.axes.Axes, matplotlib.colorbar.Colorbar
 
          """
+        plot_flags_default = dict(
+            ze=True,
+            virga=True,
+            cloud=True,
+            rainflag=True,
+        )
+        fontsize_default = dict(
+            title=18,
+            legend=16,
+            ax_label=16,
+            ax_ticklabel=14,
+            cbar_label=16,
+            cbar_ticklabel=14,
+        )
+        if fontsize is None:
+            fontsize = fontsize_default
+        if plot_flags is None:
+            plot_flags = plot_flags_default
+
+        fontsize = {**fontsize_default, **fontsize}
+        plot_flags = {**plot_flags_default, **plot_flags}
+
         if axs is None:
             # ,figsize=(10,8)
             fig, axs = plt.subplots(3, 1, figsize=(15, 15), constrained_layout=True)
@@ -475,20 +607,23 @@ class VirgaSnifferPlotAccessor:
         etime = pd.to_datetime(self._time.values[-1])
         # axs[0].set_title(f"{stime:%d.%m.%Y %H:%M} UTC - {etime:%d.%m.%Y %H:%M} UTC",
         #                  fontsize=24, fontweight='bold')
-        axs[0].set_title(f"{radar} {stime:%Y-%m-%d}",
-                         fontsize=18)
-        self.quicklook_ze(ax=axs[0],
-                          ylim=ylim,
-                          radar=radar)
-        self.quicklook_vel(ax=axs[1],
-                           ylim=ylim,
-                           radar=radar)
-        self.quicklook_flag_virga(ax=axs[2],
-                                  ylim=ylim)
+        axs[0].set_title(f"{radar} {stime:%d %B %Y}",
+                         fontsize=fontsize['title'])
+        cbars = [0, 0, 0]
+        axs[0], cbars[0] = self.quicklook_ze(ax=axs[0],
+                                             ylim=ylim,
+                                             fontsize=fontsize)
+        axs[1], cbars[1] = self.quicklook_vel(ax=axs[1],
+                                              ylim=ylim,
+                                              fontsize=fontsize)
+        axs[2], cbars[2] = self.quicklook_flag_virga(ax=axs[2],
+                                                     fontsize=fontsize,
+                                                     plot_flags=plot_flags,
+                                                     ylim=ylim)
 
         axs[0].set_xlabel("")
         axs[1].set_xlabel("")
-        axs[2].set_xlabel('Time (UTC)', fontsize=15)
+        axs[2].set_xlabel('Time (UTC)', fontsize=fontsize['ax_label'])
         fig = axs[0].get_figure()
         fig.autofmt_xdate()
-        return fig, axs
+        return fig, axs, cbars
