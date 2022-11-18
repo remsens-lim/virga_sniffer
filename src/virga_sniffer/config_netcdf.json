@@ -53,7 +53,8 @@
   "cloud_base_height": {
     "long_name": "cloud base height",
     "standard_name": "cloud_base_altitude",
-    "units": "m"
+    "units": "m",
+    "note": "Per design it is possible that there is a cloud base height value, but actually no cloud is detected. This is because the cloud base is used to initiate detection and is filled during preprocessing with e.g. the LCL or by interpolating."
   },
   "cloud_top_rg": {
     "long_name":"cloud top range gate index"
