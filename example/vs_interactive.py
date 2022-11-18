@@ -70,7 +70,7 @@ def vmask_interact(input_file,
                   cbh_fill_limit=cbh_fill_limit)
     vsout = vm(input_data, config=config)
 
-    fig,axs = vsout.vsplot.quicklook_full(ylim=ymax)
+    pltout = vsout.vsplot.quicklook_full(ylim=ymax)
 
     colors = [
         "k",
