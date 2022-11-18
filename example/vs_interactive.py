@@ -1,5 +1,4 @@
-import sys
-sys.path.append('../src/')
+
 import os
 import json
 import numpy as np
@@ -89,6 +88,7 @@ def vsinteractive():
     input_file = widgets.Text(
         value="../example/test_data/2020-01-24_00_virga-sniffer_input.nc",
         placeholder='path to input file')
+
     ymax = widgets.IntSlider(min=1000, max=15000, step=1000, value=6000,
                              continuous_update=False)
 
