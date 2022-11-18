@@ -9,7 +9,7 @@ from typing import Tuple, Any
 import xarray as xr
 import numpy as np
 import pandas as pd
-import matplotlib
+# import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
@@ -169,7 +169,7 @@ class VirgaSnifferPlotAccessor:
         else:
             return ax, 0
 
-    def plot_flag_virga(self,
+    def plot_virga_mask(self,
                         ax=None,
                         color="#fb9a99"):
         """
@@ -190,7 +190,7 @@ class VirgaSnifferPlotAccessor:
         if ax is None:
             ax = plt.gca()
 
-        plt_vmask = self._obj.flag_virga.values.astype(float)
+        plt_vmask = self._obj.mask_virga.values.astype(float)
         plt_vmask[plt_vmask == 0] = np.nan
 
         ax.contourf(self._time,
@@ -201,7 +201,7 @@ class VirgaSnifferPlotAccessor:
                     alpha=0.8)
         return ax
 
-    def plot_flag_cloud(self,
+    def plot_cloud_mask(self,
                         ax=None,
                         color="#a6cee3"):
         """
@@ -223,7 +223,7 @@ class VirgaSnifferPlotAccessor:
         if ax is None:
             ax = plt.gca()
 
-        plt_cmask = self._obj.flag_cloud.values.astype(float)
+        plt_cmask = self._obj.mask_cloud.values.astype(float)
         plt_cmask[plt_cmask == 0] = np.nan
 
         ax.contourf(self._time,
@@ -234,7 +234,7 @@ class VirgaSnifferPlotAccessor:
                     alpha=0.8)
         return ax
 
-    def plot_flag_ze(self,
+    def plot_ze_mask(self,
                      ax=None,
                      color="#7fc97f"):
         """
@@ -451,7 +451,7 @@ class VirgaSnifferPlotAccessor:
         cbar.ax.tick_params(axis='both', which='minor', width=2, length=3)
         return ax, cbar
 
-    def quicklook_flag_virga(self,
+    def quicklook_virga_mask(self,
                              ax=None,
                              ylim=None,
                              legend=True,
@@ -509,19 +509,19 @@ class VirgaSnifferPlotAccessor:
             ylim = (1. + np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3)) * 1e3
 
         if plot_flags['ze']:
-            self.plot_flag_ze(ax=ax)
+            self.plot_ze_mask(ax=ax)
         if plot_flags['virga']:
-            self.plot_flag_virga(ax=ax)
+            self.plot_virga_mask(ax=ax)
         if plot_flags['cloud']:
-            self.plot_flag_cloud(ax=ax)
+            self.plot_cloud_mask(ax=ax)
         if plot_flags['rainflag']:
             self.plot_flag_rain(ax=ax,fontsize=fontsize)
         ax, cbar = self.plot_cbh(ax=ax,fontsize=fontsize)
         
         if legend:
-            virga_patch = mpatches.Patch(color="#fb9a99", label='flag_virga')
-            cloud_patch = mpatches.Patch(color="#a6cee3", label='flag_cloud')
-            radar_patch = mpatches.Patch(color="#7fc97f", label='radar-signal')
+            virga_patch = mpatches.Patch(color="#fb9a99", label='virga mask')
+            cloud_patch = mpatches.Patch(color="#a6cee3", label='cloud mask')
+            radar_patch = mpatches.Patch(color="#7fc97f", label='radar signal')
             cloud_base_line = Line2D([0], [0], color='k', lw=2)
             cloud_layer_fill = Line2D([0], [0], color='k', lw=2, ls=':')
             cloud_top_line = Line2D([0], [0], color='k', lw=2, ls='--')
@@ -529,7 +529,7 @@ class VirgaSnifferPlotAccessor:
             ax.legend([cloud_base_line, cloud_top_line, cloud_layer_fill,
                        radar_patch, virga_patch, cloud_patch],
                       ['cloud-base', 'cloud-top', 'filled cloud-base',
-                       'radar-signal', 'flag_virga', 'flag_cloud'],
+                       'radar signal', 'virga mask', 'cloud mask'],
                       fontsize=fontsize['legend'],
                       ncol=2)
         ax.set_ylim([0, ylim])
@@ -616,7 +616,7 @@ class VirgaSnifferPlotAccessor:
         axs[1], cbars[1] = self.quicklook_vel(ax=axs[1],
                                               ylim=ylim,
                                               fontsize=fontsize)
-        axs[2], cbars[2] = self.quicklook_flag_virga(ax=axs[2],
+        axs[2], cbars[2] = self.quicklook_virga_mask(ax=axs[2],
                                                      fontsize=fontsize,
                                                      plot_flags=plot_flags,
                                                      ylim=ylim)

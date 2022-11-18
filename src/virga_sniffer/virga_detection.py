@@ -309,9 +309,9 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     output_rainflag_lowestrg = np.full(ds.Ze.time.size,False)
     if config['mask_rain_ze']:
         output_rainflag_lowestrg += ds.Ze.values[:, 0]>config['ze_thres']
-    virga_depth_rgmid = np.zeros(cbh.shape)
-    virga_depth_rgedge = np.zeros(cbh.shape)
-    virga_depth_nogap = np.zeros(cbh.shape)
+    virga_depth_rgmid = np.full(cbh.shape, np.nan)
+    virga_depth_rgedge = np.full(cbh.shape, np.nan)
+    virga_depth_nogap = np.full(cbh.shape, np.nan)
     idxs_vth = np.full(cbh.shape, -1)
     idxs_vbh = np.full(cbh.shape, -1)
     vth = np.full(cbh.shape, np.nan)
@@ -336,12 +336,22 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     cloud_depth[cloud_depth <= 0] = np.nan
 
     # flag extensions
-    number_cloud_layers = np.count_nonzero(~np.isnan(cloud_depth), axis=1)
+    flag_cloud_layer = ~np.isnan(cloud_depth)
+    flag_cloud = np.any(flag_cloud_layer, axis=1)
+    number_cloud_layers = np.count_nonzero(flag_cloud_layer, axis=1)
 
-    output_dataset = xr.Dataset({"flag_virga": (('time', 'range'), vmask),
-                                 "flag_virga_layer": (('time', 'range', 'layer'), vmask_layer),
-                                 "flag_cloud": (('time', 'range'), cmask),
-                                 "flag_cloud_layer": (('time', 'range', 'layer'), cmask_layer),
+    flag_virga_layer = ~np.isnan(virga_depth_nogap)
+    flag_virga = np.any(flag_virga_layer, axis=1)
+
+    output_dataset = xr.Dataset({"mask_virga": (('time', 'range'), vmask),
+                                 "mask_virga_layer": (('time', 'range', 'layer'), vmask_layer),
+                                 "mask_cloud": (('time', 'range'), cmask),
+                                 "mask_cloud_layer": (('time', 'range', 'layer'), cmask_layer),
+                                 "flag_virga": ('time', flag_virga),
+                                 "flag_virga_layer": (('time', 'layer'), flag_virga_layer),
+                                 "flag_cloud": ('time', flag_cloud),
+                                 "flag_cloud_layer": (('time', 'layer'), flag_cloud_layer),
+                                 "number_cloud_layers": ('time', number_cloud_layers),
                                  "virga_depth": (('time', 'layer'), virga_depth_nogap),
                                  "virga_depth_maximum_extend": (('time', 'layer'), virga_depth_rgedge),
                                  "cloud_depth": (('time', 'layer'), cloud_depth),

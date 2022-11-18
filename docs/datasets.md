@@ -67,23 +67,49 @@ The lifting condensation level can be calculated from surface observations of ai
 The results of the virga and cloud detection are stored in the output dataset as boolean flags with the same dimensions as the radar reflectivity input data. In addition, the processed cloud-base and -top heights are stored, as well as some basic characteristics such as cloud and virga depth for each column. The output is provided as a
 [xarray.Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html) - names, units and description are provided in the following:
 
-### Virga flag
- - **name**: *flag_virga*, *flag_virga_layer*
+### Virga mask
+ - **name**: *mask_virga*, *mask_virga_layer*
  - **units**: bool
  - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
 
-With the same dimensions as the input *Ze*, the boolean flags are True if virga is detected. In *flag_virga_layer*, the *flag_virga* mask is separated by each cloud layer, so that only virga 
+With the same dimensions as the input *Ze*, the boolean masks are True if virga is detected on the radar data points.
+In *mask_virga_layer*, the *mask_virga* mask is separated by each cloud layer, so that only virga 
 attached to the cloud base of the respective layer is True. 
 ```
-flag_virga = flag_virga.sum(axis=-1).astype(bool) 
+mask_virga = mask_virga.sum(axis=-1).astype(bool) 
 ```
+
+### Cloud mask
+ - **name**: *mask_cloud*, *mask_cloud_layer*
+ - **units**: bool
+ - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
+
+Similar to the virga masks, this masks are True if a clouds are detected on the radar data points.
+
+### Virga flag
+ - **name**: *flag_virga*, *flag_virga_layer*
+ - **units**: bool
+ - **dimensions**: (*time*), (*time*, *layer*)
+
+These flags are True if virga is detected in an entire column / within a cloud layer at a certain time-step. 
 
 ### Cloud flag
  - **name**: *flag_cloud*, *flag_cloud_layer*
  - **units**: bool
- - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
+ - **dimensions**: (*time*), (*time*, *layer*)
 
-Similar to the virga flag, this flag is True if a cloud is detected.
+These flags are True if clouds are detected in an entire column / at a cloud layer at a certain time-step.
+
+### Number of cloud layers
+ - **name**: *number_cloud_layers*
+ - **units**: -
+ - **dimensions**: (*time*)
+
+This value is a count of detected clouds in different layers, e.g.:
+
+```
+number_cloud_layers = np.count_nonzero(flag_cloud_layer, axis=1)
+```
 
 ### Virga depth
  - **name**: *virga_depth*, *virga_depth_maximum_extend*

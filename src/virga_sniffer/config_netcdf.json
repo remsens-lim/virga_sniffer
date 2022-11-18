@@ -1,19 +1,39 @@
 {
-  "flag_virga": {
-    "long_name": "Virga Flag",
+  "mask_virga": {
+    "long_name": "Virga mask on radar coordinates.",
     "note": "True if virga is identified."
   },
-  "flag_virga_layer": {
-    "long_name": "Virga Flag for each cloud layer",
+  "mask_virga_layer": {
+    "long_name": "Virga mask on radar coordinates, separated for each cloud layer.",
     "note": "True if virga is identified."
+  },
+  "mask_cloud": {
+    "long_name": "Cloud mask on radar coordinates.",
+    "note": "True if cloud is identified by selecting valid radar signal between cloud base and top."
+  },
+  "mask_cloud_layer": {
+    "long_name": "Cloud mask on radar coordinates, separated for each cloud layer",
+    "note": "True if cloud is identified by selecting valid radar signal between cloud base and top."
+  },
+  "flag_virga": {
+    "long_name": "Flag virga at time-step.",
+    "note": "True if virga is identified at a certain time-step."
   },
   "flag_cloud": {
-    "long_name": "Cloud Flag",
-    "note": "True if cloud is identified by selecting valid radar signal between cloud base and top."
+    "long_name": "Flag cloud at time-step.",
+    "note": "True if there is any cloud at a certain time-step."
+  },
+  "flag_virga_layer": {
+    "long_name": "Flag virga at time-step within a cloud layer.",
+    "note": "True if virga is identified within a cloud layer at a certain time-step."
   },
   "flag_cloud_layer": {
-    "long_name": "Cloud Flag for each cloud layer",
-    "note": "True if cloud is identified by selecting valid radar signal between cloud base and top."
+    "long_name": "Flag cloud at time-step within at cloud layer.",
+    "note": "True if a cloud is identified at a certain cloud layer and time-step."
+  },
+  "number_cloud_layers": {
+    "long_name": "Number of layers containing clouds.",
+    "note": "Count of the number of identified cloud layers which at a certain time-step contain a cloud."
   },
   "virga_top_height": {
     "long_name": "virga top height",
