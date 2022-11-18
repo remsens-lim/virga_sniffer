@@ -39,7 +39,7 @@ class VirgaSnifferPlotAccessor:
                  label_lcl="LCL from sfc-obs",
                  # color_fill = "#984ea3",
                  label_fill="cloud base interpolated",
-                 ) -> tuple[Any, Any]:
+                 ):
         """
         Plot all cloud layer related output: cloud-base height, cloud-top height, lifitng-condensation-level,
          and filled layer.
