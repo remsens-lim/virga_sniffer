@@ -8,6 +8,7 @@ import os
 import xarray as xr
 import numpy as np
 import json
+import warnings
 
 
 from . import layer_utils
@@ -38,7 +39,7 @@ from . import vsplot
 #     cbh_ident_function=[1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4])  # order of operations applied to cbh: 0-clean, 1-split, 2-merge, 3-add-LCL, 4-smooth
 
 
-def check_input_config(input_data: xr.Dataset, config: dict) -> None:
+def check_input_config(input_data: xr.Dataset, config: dict, default_config: dict) -> None:
     """
     Check input requirements of `virga_mask`
 
@@ -46,6 +47,7 @@ def check_input_config(input_data: xr.Dataset, config: dict) -> None:
     ----------
     input_data: xarray.Dataset
     config: dict
+    default_config: dict
 
     Returns
     -------
@@ -63,6 +65,11 @@ def check_input_config(input_data: xr.Dataset, config: dict) -> None:
         raise Exception("config['mask_vel']==True while input['vel'] is missing.")
     if config['mask_clutter'] and ("vel" not in input_vars):
         raise Exception("config['mask_clutter']==True while input['vel'] is missing.")
+        
+    # Warn if keys are in the user config are not used - possible typos...
+    keys_not_used = config.keys() - default_config.keys()
+    for key in keys_not_used:
+        warnings.warn(f"Key in user configuration is not used: {key}.")
 
 
 def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
@@ -126,7 +133,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     ds = input_data.rename(rename_map)
 
     # check input
-    check_input_config(ds, config)
+    check_input_config(ds, config, default_config)
 
     # calculate top and base of each range-gate
     # this will be used to identify the range-gate index of CBH, CTH in radar data
