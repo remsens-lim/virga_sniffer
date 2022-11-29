@@ -112,6 +112,8 @@ def process_cbh(input_data: xr.Dataset,
     idx_fill = np.full(cbh.shape, False)
     if not ((config["cbh_fill_method"] is None) or (config['cbh_fill_limit'] == 0)):
         # fill layer
+        # removing layer with less than 2 datapoints, else interpolation is not working
+        cbh = clean_N(cbh, N=1)
         cbh, idx_fill_tmp = fill_nan(cbh,
                                      limit=config['cbh_fill_limit'],
                                      method=config["cbh_fill_method"],
@@ -142,6 +144,36 @@ def clean(input_data: xr.DataArray, clean_threshold: float) -> xr.DataArray:
     data_tmp = input_data.values
     layer_ndatapoints = np.count_nonzero(~np.isnan(data_tmp), axis=0)
     layer_nthreshold = clean_threshold * data_tmp.shape[0]
+    data_tmp = data_tmp[:, layer_ndatapoints > layer_nthreshold]
+    # guarantee at least one layer of nan values.
+    if data_tmp.shape[1] == 0:
+        data_tmp = np.full((data_tmp.shape[0],1),np.nan)
+    output_data = xr.DataArray(data_tmp,
+                               coords={dims[0]: input_data[dims[0]].data,
+                                       dims[1]: np.arange(data_tmp.shape[1])})
+    return output_data
+
+def clean_N(input_data: xr.DataArray, N: int) -> xr.DataArray:
+    """
+    Clean input layer data by dropping layer with low number `N` of data points.
+
+    Parameters
+    ----------
+    input_data: xarray.DataArray
+        Input 2-D DataArray, assuming 2nd dimension refers to layer number.
+    N: int
+        Layer with number of datapoints < `N`
+
+    Returns
+    -------
+    xarray.DataArray
+        `input_data` but layer with no or low number of  datapoints dropped.
+        The 2nd dimension will be re-indexed.
+    """
+    dims = input_data.dims
+    data_tmp = input_data.values
+    layer_ndatapoints = np.count_nonzero(~np.isnan(data_tmp), axis=0)
+    layer_nthreshold = N
     data_tmp = data_tmp[:, layer_ndatapoints > layer_nthreshold]
     # guarantee at least one layer of nan values.
     if data_tmp.shape[1] == 0:
