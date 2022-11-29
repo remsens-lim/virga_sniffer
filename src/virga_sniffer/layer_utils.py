@@ -308,8 +308,9 @@ def replace_nan(input_data: xr.DataArray,
     """
     data_tmp = input_data.copy()
     data_tmp.values[:, layer] = input_layer.values
-    output_data = input_data.dropna(dim=input_data.dims[layer])
-    output_data = output_data.combine_first(data_tmp)
+    output_data = xr.where(~np.isnan(input_data.values),
+                           input_data,
+                           data_tmp)
     if return_mask:
         merge_mask = np.isnan(input_data.values[:, layer])
         merge_mask *= ~np.isnan(input_layer.values)

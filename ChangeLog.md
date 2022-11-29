@@ -3,6 +3,10 @@
 **From version v0.3.4 to v0.3.5 some output variables are renamed and the name is taken over by new added variables with different meaning. When upgrading, read the Changelog carefully**
 
 * masking rain by *flag_surface_rain* and *flag_rain_ze* is now applied only if precipitation is detected in the lowest range-gate
+* **layer_utils:**
+  * Fixed a bug of the replace_nan method, which results in complete replacement (not only nans) by the alternative data. **This method is used to merge the optional LCL data into the first layer of CBH - Therefore, before the fix, first layer CBH data was forced to be LCL**
+* **virga_detection:**
+  * Issue a warning if user config dictionary contains keys which are not used by the Virga-Sniffer - may be a typo by the user
 * **vsplot:**
   * More customizations options, e.g., fontsize and data selection
   * rename *vsplot.flag_surface_rain* to *vsplot.flag_rain*, as it plots now the combination of *flag_surface_rain* and *flag_rain_ze*
