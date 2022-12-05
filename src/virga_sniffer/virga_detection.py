@@ -171,12 +171,14 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     mask_tmp_virga = vmask.copy()
 
     if config['ze_max_gap'] > 0:
+        config['ze_max_gap'] = None if np.isinf(config['ze_max_gap']) else config['ze_max_gap']
         mask_tmp_cloud= utils.fill_mask_gaps(mask_tmp_cloud,
                                               altitude=ds.range.data,
                                               max_gap=config['ze_max_gap'],
                                               idxs_true=idxs_top)
 
     if config['virga_max_gap'] > 0:
+        config['virga_max_gap'] = None if np.isinf(config['virga_max_gap']) else config['virga_max_gap']
         mask_tmp_virga = utils.fill_mask_gaps(mask_tmp_virga,
                                               altitude=ds.range.data,
                                               max_gap=config['virga_max_gap'],
