@@ -112,12 +112,12 @@ number_cloud_layers = np.count_nonzero(flag_cloud_layer, axis=1)
 ```
 
 ### Virga depth
- - **name**: *virga_depth*, *virga_depth_maximum_extend*
+ - **name**: *virga_depth*, *virga_depth_maximum_extent*
  - **units**: m
  - **dimensions**: (*time*, *layer*)
 
-*virga_depth* and *virga_depth_maximum_extend* are measures of the vertical extend of the virga, but calculated differently. *virga_depth* denotes the sum of the vertical extend of all range-gates 
-where virga is detected, thus excluding gaps introduced by [virga_max_gap](cfg_thres). *virga_depth_maximum_extend* includes these gaps, by being calculated by ```virga_top_height - virga_base_height```. Therefore, *virga_depth* should be used, when calculating volumetric characteristics, such as the liquid water path, and *virga_depth_maximum_extend* for geometric characteristics.
+*virga_depth* and *virga_depth_maximum_extent* are measures of the vertical extend of the virga, but calculated differently. *virga_depth* denotes the sum of the vertical extend of all range-gates 
+where virga is detected, thus excluding gaps introduced by [virga_max_gap](cfg_thres). *virga_depth_maximum_extent* includes these gaps, by being calculated by ```virga_top_height - virga_base_height```. Therefore, *virga_depth* should be used, when calculating volumetric characteristics, such as the liquid water path, and *virga_depth_maximum_extent* for geometric characteristics.
 
 ### Cloud depth
  - **name**: *cloud_depth*

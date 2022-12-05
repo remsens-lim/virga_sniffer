@@ -19,6 +19,7 @@
   * rename *flag_cloud* to *mask_cloud*
   * rename *flag_virga_layer* to *mask_virg_layera*
   * rename *flag_cloud_layer* to *mask_cloud_layer*
+  * rename *virga_depth_maximum_extend* to *virga_depth_maximum_extent*
   * added *flag_lowest_rg_rain*, with the flag if rain is detected at lowest range-gate from the radar reflectivity
   * added *flag_virga* and *flag_virga_layer* as a flag if virga is detected at a time-step and layer
   * added *flag_cloud* and *flag_cloud_layer* as a flag if virga is detected at a time-step and layer

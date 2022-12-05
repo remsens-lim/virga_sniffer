@@ -362,7 +362,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                                  "flag_cloud_layer": (('time', 'layer'), flag_cloud_layer),
                                  "number_cloud_layers": ('time', number_cloud_layers),
                                  "virga_depth": (('time', 'layer'), virga_depth_nogap),
-                                 "virga_depth_maximum_extend": (('time', 'layer'), virga_depth_rgedge),
+                                 "virga_depth_maximum_extent": (('time', 'layer'), virga_depth_rgedge),
                                  "cloud_depth": (('time', 'layer'), cloud_depth),
                                  "virga_top_rg": (('time', 'layer'), idxs_vth),
                                  "virga_base_rg": (('time', 'layer'), idxs_vbh),
