@@ -97,8 +97,12 @@ def process_cbh(input_data: xr.Dataset,
 
         elif cbhpro == 3:
             # add lcl
-            cbh, idx_lcl_tmp = replace_nan(cbh, input_layer=lcl,
-                                           layer=0, return_mask=True)
+            if config['lcl_replace_cbh']:
+                idx_lcl_tmp = ~np.isnan(lcl.values)
+                cbh.values[idx_lcl_tmp, 0] = lcl.values[idx_lcl_tmp]
+            else:
+                cbh, idx_lcl_tmp = replace_nan(cbh, input_layer=lcl,
+                                               layer=0, return_mask=True)
             idx_lcl += idx_lcl_tmp
 
         elif cbhpro == 4:

@@ -24,8 +24,9 @@ Flags are boolean values which control certain functionality of the Virga-Sniffe
    the input dataset.
  - **mask_rain = True**: If **True**, this flag switches on the use of the *flag_surface_rain* variable from the input dataset in order to consider virga only, if no rain is observed at the 
    surface. This is applied to the lowest present cloud layer at any given time. Therefore, higher layer virga events will not be masked if rain is detected at the surface.
- - **mask_rain_ze**: Similar to **mask_rain**, but instead of using *flag_surface_rain* from the input data, the radar reflectivity at the lowest range gate is tested against the **ze_thres** 
+ - **mask_rain_ze = True**: Similar to **mask_rain**, but instead of using *flag_surface_rain* from the input data, the radar reflectivity at the lowest range gate is tested against the **ze_thres** 
    threshold in order to estimate if precipitation will reach the surface.
+ - **lcl_replace_cbh = True**: If additional LCL data is provided, the lowest cbh layer is replaced by this data if this flag is **True** (default). This is helpful to force the cloud base to the lifting condensation level in conditions when clouds develop by lifting and CBH data is potentially erroneous do to strong up- and downdrafts. 
 
 (cfg_thres)=
 ## Thresholds

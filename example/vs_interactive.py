@@ -18,6 +18,7 @@ with open("../src/virga_sniffer/config_vsdefault.json") as json_file:
 def vmask_interact(input_file,
                    cbh_smooth_window,
                    lcl_smooth_window,
+                   lcl_replace_cbh,
                    require_cbh,
                    mask_rain_ze,
                    ze_thres,
@@ -51,6 +52,7 @@ def vmask_interact(input_file,
 
     config = dict(cbh_smooth_window=cbh_smooth_window,
                   lcl_smooth_window=lcl_smooth_window,
+                  lcl_replace_cbh=lcl_replace_cbh,
                   require_cbh=require_cbh,
                   mask_rain_ze=mask_rain_ze,
                   ze_thres=ze_thres,
@@ -98,6 +100,7 @@ def vsinteractive():
     lcl_smooth_window = widgets.IntSlider(min=0, max=600, step=60,
                                           value=default_config['lcl_smooth_window'],
                                           continuous_update=False)
+    lcl_replace_cbh = widgets.Checkbox(value=default_config['lcl_replace_cbh'], indent=False)
     require_cbh = widgets.Checkbox(value=default_config['require_cbh'], indent=False)
     mask_rain = widgets.Checkbox(value=default_config['mask_rain'], indent=False)
     mask_rain_ze = widgets.Checkbox(value=default_config['mask_rain_ze'], indent=False)
@@ -157,6 +160,7 @@ def vsinteractive():
                       cbh_processing]),
         widgets.HBox([Label("Layer max filling [min]:"),cbh_fill_method,cbh_fill_limit]),
         widgets.HBox([Label("LCL smooth window [s]:"),lcl_smooth_window]),
+        widgets.HBox([Label("LCL replace 1st cbh layer:"), lcl_replace_cbh]),
         Label("Virga Mask: -----------------------------------------------------------"),
         widgets.HBox([Label("Require CBH          :"), require_cbh]),#Label('Detection of Virga requires CBH value in column')
         widgets.HBox([Label("Rain Mask (Ze) [dBz] :"),  ze_thres,mask_rain_ze]),#Label("No Virga if Ze of lowest range-gate is above threshold [dBz]")
@@ -175,6 +179,7 @@ def vsinteractive():
                                      dict(input_file=input_file,
                                           cbh_smooth_window=cbh_smooth_window,
                                           lcl_smooth_window=lcl_smooth_window,
+                                          lcl_replace_cbh=lcl_replace_cbh,
                                           require_cbh=require_cbh,
                                           mask_rain_ze=mask_rain_ze,
                                           ze_thres=ze_thres,
