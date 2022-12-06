@@ -11,6 +11,91 @@ from scipy.ndimage import median_filter
 import scipy.special
 
 
+def get_gapidx(mask, fill_value=None):
+    """
+    Retrieve the index of gaps (False values) in a boolean mask.
+
+    Parameters
+    ----------
+    mask: array_like
+        Boolean mask of shape (M,N)
+    fill_value: int or None, optional
+        This value is used to pad the output array (axis 1). The default is M-1.
+    Returns
+    -------
+    gapsidx: array_like, (M,L)
+        The index of gaps along dimension N
+
+    """
+    if fill_value is None:
+        fill_value = mask.shape[1] - 1
+    
+    Ncounts = np.zeros(mask.shape[0], dtype=int)
+    # get index where gaps (False values) occur
+    # reshape to 2D array (time, gapidxs)
+    wmask = np.argwhere(~mask)
+    times, counts = np.unique(wmask[:,0], return_counts=True)
+    Ncounts[times] = counts
+    fill_mask = Ncounts[:,None] > np.arange(counts.max())
+    gapsidx = np.full(fill_mask.shape, int(fill_value), dtype=int)
+    gapsidx[fill_mask] = wmask[:,1]
+    return gapsidx
+
+def get_firstgap_dn(gapidx, idxs, fill_value=None):
+    """ Get the closest gap idx below idx """
+    if fill_value is None:
+        fill_value = -1
+        
+    Nshape = gapidx.shape
+    itim = np.arange(Nshape[0])
+
+    firstgap_dn = np.full(idxs.shape, fill_value)
+    ifirstgaptmp = np.full(Nshape[0],-1)
+
+    for ilayer in range(idxs.shape[1]):
+        # find closest index of a gap below a CBH index (idxs) 
+        ifirstgap = (gapidx.T<idxs[:,ilayer]).sum(axis=0) - 1
+        ifirstgap[ifirstgap>=Nshape[1]] = -1
+        
+        # selection, handling layer overlapp
+        tsel = np.ones(Nshape[0]).astype(bool)
+        # only assign if within a layer
+        if ilayer > 0: # not first layer
+            tsel = ifirstgap > idxs[:,ilayer-1]
+        # not assign, if already in the lower layer
+        tsel[ifirstgap==ifirstgaptmp] = False
+        ifirstgaptmp = ifirstgap
+        
+        firstgap_dn[tsel,ilayer] = gapidx[itim[tsel],ifirstgap[tsel]] 
+
+    return firstgap_dn
+
+def get_firstgap_up(gapidx, idxs, fill_value=None):
+    """ Get the closest gap idx above idx """
+    if fill_value is None:
+        fill_value = -1
+    
+    Nshape = gapidx.shape
+    itim = np.arange(Nshape[0])
+    firstgap_up = np.full(idxs.shape, fill_value)
+    ifirstgaptmp = np.full(Nshape[0],-1)
+    for ilayer in range(idxs.shape[1]):
+        # find closest index of a gap above a CBH index (idxs) 
+        ifirstgap = (gapidx.T<=idxs[:,ilayer]).sum(axis=0)
+        ifirstgap[ifirstgap>=Nshape[1]] = Nshape[1]-1
+        
+        # selection, handling layer overlapp
+        tsel = np.ones(Nshape[0]).astype(bool)
+        # only assign if within a layer
+        if ilayer != idxs.shape[1]-1: # not last layer
+            tsel = ifirstgap <= idxs[:,ilayer+1]
+        # not assign, if already in the lower layer
+        tsel[ifirstgap==ifirstgaptmp] = False
+        ifirstgaptmp = ifirstgap
+            
+        firstgap_up[tsel,ilayer] = gapidx[itim[tsel],ifirstgap[tsel]] -1
+    return firstgap_up
+
 def fill_mask_gaps(mask: NDArray[bool],
                    altitude: NDArray[float],
                    max_gap: float,
@@ -49,7 +134,8 @@ def fill_mask_gaps(mask: NDArray[bool],
     mask = mask_int.combine_first(mask)
     # convert nan back to False, now we have a mask with True==virga, False==no-virga
     # but small gaps in original mask are filled with True
-    mask = mask.fillna(False).values[:, 1:].astype(bool)
+    # mask = mask.fillna(False).values[:, 1:].astype(bool)
+    mask = mask.fillna(False).values.astype(bool)
     return mask
 
 

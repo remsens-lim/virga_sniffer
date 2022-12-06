@@ -184,46 +184,27 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                                               max_gap=config['virga_max_gap'],
                                               idxs_true=idxs_top)
 
-    for itime in range(idxs.shape[0]):
-        for ilayer in range(1, idxs.shape[1]):
-            # identify index of cbh layer in radar signal
-            # handling of nan values in cbh layer:
-            #  * if nan choose the next higher or lower layer
-            #  * lower cbh layer defaults to lowest range-gate
-            #  * higher cbh layer defaults to the highest range_gate
-            # here we can use max and min functions as we set nan values to
-            # * -1 in idxs
-            # * vmask.shape[1]-1 in idxs_top
-            ilow = np.max([np.max(idxs[itime, :ilayer + 1]), 0])
-            if ilayer == idxs.shape[1] - 1:
-                itop = vmask.shape[1] - 1
-            else:
-                itop = np.min(idxs_top[itime, ilayer + 1:])
-            # just look at this part of the mask:
-            # time i and between cbh layers
-            mask_l = mask_tmp_cloud[itime, ilow:itop]
-            if np.all(mask_l):
-                cbh.values[itime, ilayer - 1] = np.nan
-            else:
-                gapidx = np.argwhere(~mask_l)
-                if gapidx.shape[0] == 0:
-                    continue
-                cth.values[itime, ilayer - 1] = rgtop[ilow + gapidx.ravel()[0]]
-                if config['virga_max_gap'] == 0:
-                    mask_l[:gapidx.ravel()[-1]] = False
-                    vmask[itime, ilow:itop] *= mask_l
-                else:
-                    mask_l = mask_tmp_virga[itime, ilow:itop]
-                    gapidx_large = np.argwhere(~mask_l)
-                    if gapidx_large.shape[0] == 0:
-                        continue
-                    mask_l[:gapidx_large.ravel()[-1]] = False
-                    vmask[itime, ilow:itop] *= mask_l
+    # identify the index of the lowest rang-gate in each cloud layer
+    # (without dummy layer in idxs)
+    ilow = np.maximum.accumulate(idxs[:,1:], axis=1)
+    ilow[ilow==-1]=0
 
+    # fing gap range-gates
+    gapidx_cloud = utils.get_gapidx(mask_tmp_cloud)
+    gapidx_virga = utils.get_gapidx(mask_tmp_virga)
 
-    cth = cth.where(~np.isnan(cbh))
+    firstgap_cloud = utils.get_firstgap_up(gapidx_cloud, ilow)
+    firstgap_virga = utils.get_firstgap_dn(gapidx_virga, ilow)
+
+    # assign cloud top heights
+    cth.values = rgtop.take(firstgap_cloud)
+    cth = cth.where(firstgap_cloud!=-1)
+    cth = cth.where(~np.isnan(cbh.values))
     # can use additional smoothing
     cth = layer_utils.smooth(cth, window=config['cbh_smooth_window'])
+
+    # remove cbh values if connected 
+    cbh = cbh.where(~np.isnan(cth.values))
 
     # Find index of layer data for range-gate data
     idxs_cbh = np.searchsorted(rgtop, cbh.values[:, :])  # find index of cbh layers in vmask
@@ -233,6 +214,19 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
 
     # remove cloud top height value if there is no cloud
     cth = cth.where(idxs_cth != idxs_cbh)
+
+    # remove virga below gaps
+    dummy = np.ones(ds.time.size)[:,np.newaxis]
+    cbh_sel = np.concatenate((dummy*0, idxs_cbh), axis=1).astype(int)
+    vir_sel = np.concatenate((firstgap_virga, -1*dummy), axis=1).astype(int)
+    dummy = np.arange(vmask.shape[1])
+    for ilayer in range(cbh_sel.shape[1]):
+        sel = (dummy >= cbh_sel[:,ilayer][:,None])
+        sel *= (dummy < vir_sel[:,ilayer][:,None])
+        vmask[sel] = False
+    #------------------------------------------------------------------
+    
+    
 
     if config['mask_vel']:
         # Consider as Virga if doppler velocity is below threshold
