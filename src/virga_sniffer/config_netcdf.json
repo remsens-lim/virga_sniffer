@@ -77,7 +77,7 @@
     "note": "This value excludes range-gates where radar reflectivity is zero or nan. It is calculated by sum(rangegates_with_virga_top - rangegates_with_virga_base)",
     "units": "m"
   },
-  "virga_depth_maximum_extend": {
+  "virga_depth_maximum_extent": {
     "long_name": "virga depth (virga top - virga base)",
     "note": "This value includes range-gates where radar reflectivity is zero or nan. Therefore, this is a measure of geometric maximum depth of virga. For volumetric statistics it is advisable to use virga_depth (excluding empty radar range-gates).",
     "units": "m"

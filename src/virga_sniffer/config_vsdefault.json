@@ -12,6 +12,7 @@
     "clutter_c": -8,
     "clutter_m": 4,
     "cbh_smooth_window": 60,
+    "lcl_replace_cbh": true,
     "lcl_smooth_window": 300,
     "cbh_layer_thres": 500,
     "cbh_clean_thres": 0.05,

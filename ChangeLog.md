@@ -3,6 +3,10 @@
 **From version v0.3.4 to v0.3.5 some output variables are renamed and the name is taken over by new added variables with different meaning. When upgrading, read the Changelog carefully**
 
 * masking rain by *flag_surface_rain* and *flag_rain_ze* is now applied only if precipitation is detected in the lowest range-gate
+* **layer_utils:**
+  * Fixed a bug of the replace_nan method, which results in complete replacement (not only nans) by the alternative data. **This method is used to merge the optional LCL data into the first layer of CBH - Therefore, before the fix, first layer CBH data was forced to be LCL**
+* **virga_detection:**
+  * Issue a warning if user config dictionary contains keys which are not used by the Virga-Sniffer - may be a typo by the user
 * **vsplot:**
   * More customizations options, e.g., fontsize and data selection
   * rename *vsplot.flag_surface_rain* to *vsplot.flag_rain*, as it plots now the combination of *flag_surface_rain* and *flag_rain_ze*
@@ -15,6 +19,7 @@
   * rename *flag_cloud* to *mask_cloud*
   * rename *flag_virga_layer* to *mask_virg_layera*
   * rename *flag_cloud_layer* to *mask_cloud_layer*
+  * rename *virga_depth_maximum_extend* to *virga_depth_maximum_extent*
   * added *flag_lowest_rg_rain*, with the flag if rain is detected at lowest range-gate from the radar reflectivity
   * added *flag_virga* and *flag_virga_layer* as a flag if virga is detected at a time-step and layer
   * added *flag_cloud* and *flag_cloud_layer* as a flag if virga is detected at a time-step and layer
