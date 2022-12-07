@@ -217,8 +217,9 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
 
     # remove virga below gaps
     dummy = np.ones(ds.time.size)[:,np.newaxis]
-    cbh_sel = np.concatenate((dummy*0, idxs_cbh), axis=1).astype(int)
-    vir_sel = np.concatenate((firstgap_virga, -1*dummy), axis=1).astype(int)
+    cbh_sel = np.concatenate((dummy*0, ilow), axis=1).astype(int)
+    vir_sel = np.concatenate((firstgap_virga, dummy*vmask.shape[1]-1), axis=1).astype(int)
+    
     dummy = np.arange(vmask.shape[1])
     for ilayer in range(cbh_sel.shape[1]):
         sel = (dummy >= cbh_sel[:,ilayer][:,None])

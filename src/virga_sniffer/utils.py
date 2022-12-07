@@ -35,33 +35,35 @@ def get_gapidx(mask, fill_value=None):
     # reshape to 2D array (time, gapidxs)
     wmask = np.argwhere(~mask)
     times, counts = np.unique(wmask[:,0], return_counts=True)
-    Ncounts[times] = counts
-    fill_mask = Ncounts[:,None] > np.arange(counts.max())
-    gapsidx = np.full(fill_mask.shape, int(fill_value), dtype=int)
-    gapsidx[fill_mask] = wmask[:,1]
+    if len(counts)==0:
+        gapsidx = np.full((mask.shape[0],1), int(fill_value), dtype=int)
+    else:
+        Ncounts[times] = counts
+        fill_mask = Ncounts[:,None] > np.arange(counts.max())
+        gapsidx = np.full(fill_mask.shape, int(fill_value), dtype=int)
+        gapsidx[fill_mask] = wmask[:,1]
     return gapsidx
 
-def get_firstgap_dn(gapidx, idxs, fill_value=None):
+def get_firstgap_dn(gapidx, idxs):
     """ Get the closest gap idx below idx """
-    if fill_value is None:
-        fill_value = -1
-        
     Nshape = gapidx.shape
     itim = np.arange(Nshape[0])
 
-    firstgap_dn = np.full(idxs.shape, fill_value)
+    firstgap_dn = np.concatenate(
+        (np.zeros(Nshape[0])[:,None],idxs[:,:-1]),axis=1
+    ).astype(int)
     ifirstgaptmp = np.full(Nshape[0],-1)
 
     for ilayer in range(idxs.shape[1]):
         # find closest index of a gap below a CBH index (idxs) 
         ifirstgap = (gapidx.T<idxs[:,ilayer]).sum(axis=0) - 1
+        # gap is at last range-gate:
         ifirstgap[ifirstgap>=Nshape[1]] = -1
         
         # selection, handling layer overlapp
         tsel = np.ones(Nshape[0]).astype(bool)
-        # only assign if within a layer
-        if ilayer > 0: # not first layer
-            tsel = ifirstgap > idxs[:,ilayer-1]
+        # no gaps in layer:
+        tsel[ifirstgap==-1] = False
         # not assign, if already in the lower layer
         tsel[ifirstgap==ifirstgaptmp] = False
         ifirstgaptmp = ifirstgap
