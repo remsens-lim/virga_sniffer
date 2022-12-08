@@ -2,13 +2,15 @@
 ## Version 0.3.5
 **From version v0.3.4 to v0.3.5 some output variables are renamed and the name is taken over by new added variables with different meaning. When upgrading, read the Changelog carefully**
 
-* masking rain by *flag_surface_rain* and *flag_rain_ze* is now applied only if precipitation is detected in the lowest range-gate
-* **layer_utils:**
-  * Fixed a bug of the replace_nan method, which results in complete replacement (not only nans) by the alternative data. **This method is used to merge the optional LCL data into the first layer of CBH - Therefore, before the fix, first layer CBH data was forced to be LCL**
+* Masking rain by *flag_surface_rain* and *flag_rain_ze* is now applied only if precipitation is detected in the lowest range-gate
+* Initial detection of precipitation and clouds has been optimized to also handle large values of *virga_max_gap* and *ze_max_gap* correctly.
+* **configuration:**
+  * A new flag has been added to the configuration: *lcl_replace_cbh* (default=True) to change the handling of LCL data in *layer_utils.process_cbh*. If the configuration contains *3* in *cbh_process*. If True, per default, the LCL replaces the lowermost CBH layer. If False, the LCL values are merged to the lowermost CBH to replace only nan values. 
 * **virga_detection:**
   * Issue a warning if user config dictionary contains keys which are not used by the Virga-Sniffer - may be a typo by the user
 * **vsplot:**
-  * More customizations options, e.g., fontsize and data selection
+  * More customizations options, e.g., fontsize and data selection.
+  * Changed the colorscheme to colorblind friendly.
   * rename *vsplot.flag_surface_rain* to *vsplot.flag_rain*, as it plots now the combination of *flag_surface_rain* and *flag_rain_ze*
   * rename *vsplot.quicklook_flag_virga* to *vsplot.quicklook_virga_mask*
   * rename *vsplot.plot_flag_virga* to *vsplot.plot_virga_mask*
