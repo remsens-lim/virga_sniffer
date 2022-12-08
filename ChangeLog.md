@@ -1,6 +1,6 @@
 # Changelog
-## Version 0.3.5
-**From version v0.3.4 to v0.3.5 some output variables are renamed and the name is taken over by new added variables with different meaning. When upgrading, read the Changelog carefully**
+## Version 1.0.0
+**From version v0.3.4 to v1.0.0 some output variables are renamed and the name is taken over by new added variables with different meaning. When upgrading, read the Changelog carefully**
 
 * Masking rain by *flag_surface_rain* and *flag_rain_ze* is now applied only if precipitation is detected in the lowest range-gate
 * Initial detection of precipitation and clouds has been optimized to also handle large values of *virga_max_gap* and *ze_max_gap* correctly.
@@ -11,6 +11,7 @@
 * **vsplot:**
   * More customizations options, e.g., fontsize and data selection.
   * Changed the colorscheme to colorblind friendly.
+  * Use CMasher colormaps (https://doi.org/10.21105/joss.02004) for the mean Doppler velocity and radar reflectivity quicklooks
   * rename *vsplot.flag_surface_rain* to *vsplot.flag_rain*, as it plots now the combination of *flag_surface_rain* and *flag_rain_ze*
   * rename *vsplot.quicklook_flag_virga* to *vsplot.quicklook_virga_mask*
   * rename *vsplot.plot_flag_virga* to *vsplot.plot_virga_mask*

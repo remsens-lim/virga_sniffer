@@ -5,7 +5,6 @@ Methods for plotting Virga-Sniffer output, in the form of xarray dataset accesso
 
 """
 from typing import Tuple, Any
-
 import xarray as xr
 import numpy as np
 import pandas as pd
@@ -15,6 +14,7 @@ import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 from matplotlib.lines import Line2D
 from matplotlib.dates import DateFormatter
+
 
 
 @xr.register_dataset_accessor("vsplot")
@@ -244,7 +244,7 @@ class VirgaSnifferPlotAccessor:
 
     def plot_ze_mask(self,
                      ax=None,
-                     color="#969696"):
+                     color="#bdbdbd"):
         """
          Plot radar signal flag.
 
@@ -319,6 +319,8 @@ class VirgaSnifferPlotAccessor:
 
     def quicklook_ze(self,
                      ax=None,
+                     vmin=-40,
+                     vmax=20,
                      ylim=None,
                      fontsize=None,
                      rasterized=True):
@@ -329,10 +331,18 @@ class VirgaSnifferPlotAccessor:
          ----------
          ax: matplotlib.axes.Axes, optional
              The axes to assign the lines. If None uses matplotlib.pyplot.gca().
+         vmin: float, optional
+             Lower limit of the colorbar. If None, vmin is set to np.floor(np.nanmin(`vel`)).
+             The default is -40.
+         vmax: float, optional
+             Upper limit of the colorbar. If None, vmax is set to np.ceil(np.nanmax(`vel`)).
+             The default is 20.
          ylim: float, optional
-             Limit y-axis to altitude [m]. The default is np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3.
+             Limit y-axis to altitude [m].
+             The default is np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3.
          fontsize: dict, optional
-            Configuration of fontsizes. Keywords and Defaults: "ax_label"=16, "ax_ticklabel"=14, "cbar_label"=16,
+            Configuration of fontsizes.
+            Keywords and Defaults: "ax_label"=16, "ax_ticklabel"=14, "cbar_label"=16,
             "cbar_ticklabel"=14
          rasterized: bool, optional
             Turn on rasterization of matplotlib.pyplot.pcolormesh. The default is True.
@@ -342,6 +352,9 @@ class VirgaSnifferPlotAccessor:
          matplotlib.axes.Axes, matplotlib.colorbar.Colorbar
 
          """
+        from .cmap import infinity
+        from .cmap import pride
+        from .cmap import guppy
         fontsize_default = dict(
             ax_label=16,
             ax_ticklabel=14,
@@ -357,11 +370,15 @@ class VirgaSnifferPlotAccessor:
         if ylim is None:
             # limit altitude to next full km above max cloud top height
             ylim = np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3
-
+        if vmin is None:
+            vmin = np.floor(0.1*np.nanmin(self._obj.Ze.values))*10
+        if vmax is None:
+            vmax = np.ceil(0.1*np.nanmax(self._obj.Ze.values))*10
+        divnorm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
         pl1 = ax.pcolormesh(self._time,
                             self._obj.range,
                             self._obj.Ze.values.T,
-                            cmap='jet', vmin=-40, vmax=20,
+                            cmap='cmr.pride', norm=divnorm,
                             rasterized=rasterized)
         self.plot_cbh(ax=ax, colorbar=False, colors=['k'])
         ax.set_ylim([0, ylim])
@@ -378,11 +395,10 @@ class VirgaSnifferPlotAccessor:
                 ha="left", va="top",transform=ax.transAxes,
                 bbox=dict(facecolor='w',edgecolor='k',alpha=0.7))
 
-        cbar = plt.colorbar(pl1, ax=ax, fraction=0.13, pad=0.025)
+        cbar = plt.colorbar(pl1, ax=ax, fraction=0.13, pad=0.025, extend='both')
+        cbar.ax.set_yscale('linear')
         cbar.ax.set_ylabel(f"dBz", fontsize=fontsize['cbar_label'])
 
-        cbar.set_ticks(np.arange(-40, 30, 10))
-        cbar.ax.set_yticklabels(np.arange(-40, 30, 10))
         cbar.ax.tick_params(axis='both', which='major',
                             labelsize=fontsize['cbar_ticklabel'],
                             width=2, length=4)
@@ -391,6 +407,8 @@ class VirgaSnifferPlotAccessor:
 
     def quicklook_vel(self,
                       ax=None,
+                      vmin=-4,
+                      vmax=3,
                       ylim=None,
                       fontsize=None,
                       rasterized=True):
@@ -401,10 +419,18 @@ class VirgaSnifferPlotAccessor:
          ----------
          ax: matplotlib.axes.Axes, optional
              The axes to assign the lines. If None uses matplotlib.pyplot.gca().
+         vmin: float, optional
+             Lower limit of the colorbar. If None, vmin is set to np.floor(np.nanmin(`vel`)).
+             The default is -4.
+         vmax: float, optional
+             Upper limit of the colorbar. If None, vmax is set to np.ceil(np.nanmax(`vel`)).
+             The default is 3.
          ylim: float, optional
-             Limit y-axis to altitude [m]. The default is np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3.
+             Limit y-axis to altitude [m].
+             The default is np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3.
          fontsize: dict, optional
-            Configuration of fontsizes. Keywords and Defaults: "legend"=16, "ax_label"=16, "ax_ticklabel"=14,
+            Configuration of fontsizes.
+            Keywords and Defaults: "legend"=16, "ax_label"=16, "ax_ticklabel"=14,
             "cbar_label"=16, "cbar_ticklabel"=14
          rasterized: bool, optional
             Turn on rasterization of matplotlib.pyplot.pcolormesh. The default is True.
@@ -413,6 +439,7 @@ class VirgaSnifferPlotAccessor:
          matplotlib.axes.Axes, matplotlib.colorbar.Colorbar
 
          """
+        from .cmap import holly
         fontsize_default = dict(
             legend=16,
             ax_label=16,
@@ -429,12 +456,17 @@ class VirgaSnifferPlotAccessor:
         if ylim is None:
             # limit altitude to next full km above max cloud top height
             ylim = np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3
-
+        if vmin is None:
+            vmin = np.floor(np.nanmin(self._obj.vel.values))
+        if vmax is None:
+            vmax = np.ceil(np.nanmax(self._obj.vel.values))
+        divnorm = mcolors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+        
         pl2 = ax.pcolormesh(self._time,
                             self._obj.range,
                             self._obj.vel.values.T,
-                            cmap='jet',
-                            vmin=-4, vmax=3,
+                            norm=divnorm,
+                            cmap='cmr.holly',
                             rasterized=rasterized)
         self.plot_cbh(ax=ax, fontsize=fontsize, colorbar=False, colors=['k'])
  
@@ -450,11 +482,9 @@ class VirgaSnifferPlotAccessor:
                 ha="left", va="top", transform=ax.transAxes,
                 bbox=dict(facecolor='w', edgecolor='k', alpha=0.7))
 
-        # cax = ax1.inset_axes([1.04, 0.2, 0.05, 0.6], transform=ax1.transAxes)
-        cbar = plt.colorbar(pl2, ax=ax, fraction=0.13, pad=0.025)
+        cbar = plt.colorbar(pl2, ax=ax, fraction=0.13, pad=0.025, extend='both')
+        cbar.ax.set_yscale('linear')
         cbar.ax.set_ylabel(f"m/s", fontsize=fontsize['cbar_label'])
-        cbar.set_ticks(np.arange(-4, 4, 1))
-        cbar.ax.set_yticklabels(np.arange(-4, 4, 1))
         cbar.ax.tick_params(axis='both', which='major', labelsize=fontsize['cbar_ticklabel'], width=2, length=4)
         cbar.ax.tick_params(axis='both', which='minor', width=2, length=3)
         return ax, cbar
@@ -532,7 +562,7 @@ class VirgaSnifferPlotAccessor:
             # radar_patch = mpatches.Patch(color="#7fc97f", label='radar signal')
             virga_patch = mpatches.Patch(color="#d95f02", label='virga mask')
             cloud_patch = mpatches.Patch(color="#7570b3", label='cloud mask')
-            radar_patch = mpatches.Patch(color="#969696", label='radar signal')
+            radar_patch = mpatches.Patch(color="#bdbdbd", label='radar signal')
             cloud_base_line = Line2D([0], [0], color='k', lw=2)
             cloud_layer_fill = Line2D([0], [0], color='k', lw=2, ls=':')
             cloud_top_line = Line2D([0], [0], color='k', lw=2, ls='--')
