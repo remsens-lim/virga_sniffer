@@ -273,6 +273,12 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
                 vmask_layer[itime, ilowercloudtop:icloudbase, ilayer] = vmask[itime, ilowercloudtop:icloudbase]
             # update cloudtop from lower level
             ilowercloudtop = icloudtop
+    
+    # Until now, vmask masks precipitation.
+    # Save pmask as precipitation mask, and then continue to drop rain events
+    pmask = vmask.copy()
+    pmask_layer = vmask_layer.copy()
+            
 
     if config['mask_rain']:
         # Use ancillary rain sensor data to remove detected virga if rain
@@ -346,15 +352,22 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
 
     flag_virga_layer = ~np.isnan(virga_depth_nogap)
     flag_virga = np.any(flag_virga_layer, axis=1)
+    
+    flag_precip = np.any(pmask, axis=1)
+    flag_precip_layer = np.any(pmask_layer, axis=1)
 
     output_dataset = xr.Dataset({"mask_virga": (('time', 'range'), vmask),
                                  "mask_virga_layer": (('time', 'range', 'layer'), vmask_layer),
                                  "mask_cloud": (('time', 'range'), cmask),
                                  "mask_cloud_layer": (('time', 'range', 'layer'), cmask_layer),
+                                 "mask_precip": (('time', 'range'), pmask),
+                                 "mask_precip_layer": (('time', 'range', 'layer'), pmask_layer),
                                  "flag_virga": ('time', flag_virga),
                                  "flag_virga_layer": (('time', 'layer'), flag_virga_layer),
                                  "flag_cloud": ('time', flag_cloud),
                                  "flag_cloud_layer": (('time', 'layer'), flag_cloud_layer),
+                                 "flag_precip": ('time', flag_precip),
+                                 "flag_precip_layer": (('time', 'layer'), flag_precip_layer),
                                  "number_cloud_layers": ('time', number_cloud_layers),
                                  "virga_depth": (('time', 'layer'), virga_depth_nogap),
                                  "virga_depth_maximum_extent": (('time', 'layer'), virga_depth_rgedge),
