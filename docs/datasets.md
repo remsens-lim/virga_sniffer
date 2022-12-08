@@ -84,7 +84,14 @@ mask_virga = mask_virga.sum(axis=-1).astype(bool)
  - **units**: bool
  - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
 
-Similar to the virga masks, this masks are True if a clouds are detected on the radar data points.
+Similar to the virga masks, these masks are True if a clouds are detected on the radar data points.
+
+### Precipitation mask
+ - **name**: *mask_precip*, *mask_precip_layer*
+ - **units**: bool
+ - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
+
+Similar to the virga masks, these masks are True if a precipitation is detected on the radar data points.
 
 ### Virga flag
  - **name**: *flag_virga*, *flag_virga_layer*
@@ -99,6 +106,13 @@ These flags are True if virga is detected in an entire column / within a cloud l
  - **dimensions**: (*time*), (*time*, *layer*)
 
 These flags are True if clouds are detected in an entire column / at a cloud layer at a certain time-step.
+
+### Precipitation flag
+ - **name**: *flag_precip*, *flag_precip_layer*
+ - **units**: bool
+ - **dimensions**: (*time*), (*time*, *layer*)
+
+These flags are True if precipitation is detected in an entire column / at a cloud layer at a certain time-step.
 
 ### Number of cloud layers
  - **name**: *number_cloud_layers*
@@ -163,6 +177,8 @@ method (*flag_cbh_interpolated*).
 The output dataset is enhanced with 
 [xarray.Datast accessors](https://docs.xarray.dev/en/stable/generated/xarray.register_dataset_accessor.html)
 to add plotting capability (see [vsplot](vsplot)).
+
+Parts of the quicklooks in vsplot make use of the colormaps in the [CMasher](https://ui.adsabs.harvard.edu/link_gateway/2020JOSS....5.2004V) package.
 
 The methods can be accessed with:
 ```{code-block} python

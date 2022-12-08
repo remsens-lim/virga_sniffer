@@ -326,6 +326,7 @@ class VirgaSnifferPlotAccessor:
                      rasterized=True):
         """
          Plot formatted quicklook of radar reflectivity.
+         The reflectivity is plotted using the `pride` colormap from CMasher (https://doi.org/10.21105/joss.02004).
 
          Parameters
          ----------
@@ -352,9 +353,8 @@ class VirgaSnifferPlotAccessor:
          matplotlib.axes.Axes, matplotlib.colorbar.Colorbar
 
          """
-        from .cmap import infinity
         from .cmap import pride
-        from .cmap import guppy
+
         fontsize_default = dict(
             ax_label=16,
             ax_ticklabel=14,
@@ -413,7 +413,9 @@ class VirgaSnifferPlotAccessor:
                       fontsize=None,
                       rasterized=True):
         """
-         Plot formatted quicklook of radar doppler velocity.
+         Plot formatted quicklook of radar mean Doppler velocity.
+         The mean Doppler velocity is plotted using the `holly` colormap from CMasher
+         (https://doi.org/10.21105/joss.02004).
 
          Parameters
          ----------
