@@ -84,13 +84,21 @@ class VirgaSnifferPlotAccessor:
         if ax is None:
             ax = plt.gca()
         if colors is None:
+            # colors = [
+            #     "k",
+            #     '#e41a1c',
+            #     '#ff7f00',
+            #     '#ffff33',
+            #     '#377eb8',
+            #     '#a65628',
+            # ]
             colors = [
-                "k",
-                '#e41a1c',
-                '#ff7f00',
-                '#ffff33',
-                '#377eb8',
-                '#a65628',
+                'k',
+                '#fdc086',
+                '#7fc97f',
+                '#beaed4',
+                '#386cb0',
+                '#ffff99',
             ]
         # pad colors to length
         Npad = self._obj.layer.size - len(colors)
@@ -171,7 +179,7 @@ class VirgaSnifferPlotAccessor:
 
     def plot_virga_mask(self,
                         ax=None,
-                        color="#fb9a99"):
+                        color="#d95f02"):
         """
         Plot Virga flag.
 
@@ -180,7 +188,7 @@ class VirgaSnifferPlotAccessor:
         ax: matplotlib.axes.Axes, optional
             The axes to assign the lines. If None uses matplotlib.pyplot.gca().
         color: str, optional
-            Matplotlib color, the default is "#fb9a99".
+            Matplotlib color, the default is "#d95f02".
 
         Returns
         -------
@@ -198,12 +206,12 @@ class VirgaSnifferPlotAccessor:
                     plt_vmask.T,
                     levels=1,
                     colors=[color],
-                    alpha=0.8)
+                    alpha=1)
         return ax
 
     def plot_cloud_mask(self,
                         ax=None,
-                        color="#a6cee3"):
+                        color="#7570b3"):
         """
          Plot cloud flag.
 
@@ -212,7 +220,7 @@ class VirgaSnifferPlotAccessor:
          ax: matplotlib.axes.Axes, optional
              The axes to assign the lines. If None uses matplotlib.pyplot.gca().
          color: str, optional
-             Matplotlib color, the default is "#a6cee3".
+             Matplotlib color, the default is "#7570b3".
 
          Returns
          -------
@@ -231,12 +239,12 @@ class VirgaSnifferPlotAccessor:
                     plt_cmask.T,
                     levels=1,
                     colors=[color],
-                    alpha=0.8)
+                    alpha=1)
         return ax
 
     def plot_ze_mask(self,
                      ax=None,
-                     color="#7fc97f"):
+                     color="#969696"):
         """
          Plot radar signal flag.
 
@@ -245,7 +253,7 @@ class VirgaSnifferPlotAccessor:
          ax: matplotlib.axes.Axes, optional
              The axes to assign the lines. If None uses matplotlib.pyplot.gca().
          color: str, optional
-             Matplotlib color, the default is "#7fc97f".
+             Matplotlib color, the default is "#969696".
 
          Returns
          -------
@@ -298,7 +306,7 @@ class VirgaSnifferPlotAccessor:
         if scale is None:
             scale = self._obj.range.values[0] * 0.9
 
-        ax.axhline(scale, color=(0.3, 0.3, 0.3), linestyle=':', linewidth=1)
+        # ax.axhline(scale, color=(0.3, 0.3, 0.3), linestyle=':', linewidth=1)
         # ax.text(self._time[0], 0, "flag_rain", fontsize=fontsize['legend'])
         ax.text(0.005, 0.01, "Rain flag:",
                 fontsize=fontsize['legend'],
@@ -355,7 +363,7 @@ class VirgaSnifferPlotAccessor:
                             self._obj.Ze.values.T,
                             cmap='jet', vmin=-40, vmax=20,
                             rasterized=rasterized)
-        self.plot_cbh(ax=ax, colorbar=False)
+        self.plot_cbh(ax=ax, colorbar=False, colors=['k'])
         ax.set_ylim([0, ylim])
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
         ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
@@ -428,8 +436,8 @@ class VirgaSnifferPlotAccessor:
                             cmap='jet',
                             vmin=-4, vmax=3,
                             rasterized=rasterized)
-        self.plot_cbh(ax=ax, fontsize=fontsize, colorbar=False)
-
+        self.plot_cbh(ax=ax, fontsize=fontsize, colorbar=False, colors=['k'])
+ 
         ax.set_ylim([0, ylim])
         ax.set_yticks(ax.get_yticks(), ax.get_yticks() * 1e-3)
         ax.xaxis.set_major_formatter(DateFormatter('%H:%M'))
@@ -519,9 +527,12 @@ class VirgaSnifferPlotAccessor:
         ax, cbar = self.plot_cbh(ax=ax,fontsize=fontsize)
         
         if legend:
-            virga_patch = mpatches.Patch(color="#fb9a99", label='virga mask')
-            cloud_patch = mpatches.Patch(color="#a6cee3", label='cloud mask')
-            radar_patch = mpatches.Patch(color="#7fc97f", label='radar signal')
+            # virga_patch = mpatches.Patch(color="#fb9a99", label='virga mask')
+            # cloud_patch = mpatches.Patch(color="#a6cee3", label='cloud mask')
+            # radar_patch = mpatches.Patch(color="#7fc97f", label='radar signal')
+            virga_patch = mpatches.Patch(color="#d95f02", label='virga mask')
+            cloud_patch = mpatches.Patch(color="#7570b3", label='cloud mask')
+            radar_patch = mpatches.Patch(color="#969696", label='radar signal')
             cloud_base_line = Line2D([0], [0], color='k', lw=2)
             cloud_layer_fill = Line2D([0], [0], color='k', lw=2, ls=':')
             cloud_top_line = Line2D([0], [0], color='k', lw=2, ls='--')
