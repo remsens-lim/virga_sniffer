@@ -31,7 +31,7 @@ from . import vsplot
 #     clutter_c=-8,  # [ms-1] intercept of clutter threshold line
 #     clutter_m=4,  # [ms-1 dBz-1] slope of clutter threshold line
 #     layer_threshold=500,  # [m] cbh layer separation
-#     ze_max_gap=150,  # [m] maximum gap between virga signal to count as connected virga and for clouds to cloud base
+#     cloud_max_gap=150,  # [m] maximum gap between virga signal to count as connected virga and for clouds to cloud base
 #     clean_threshold=0.05,  # [0-1] remove cbh layer if below (clean_treshold*100)% of total data
 #     cbh_layer_fill=True,  # fill gaps of cbh layer?
 #     cbh_fill_method='slinear',  # fill method of cbh layer gaps
@@ -170,18 +170,18 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     mask_tmp_cloud = vmask.copy()
     mask_tmp_virga = vmask.copy()
 
-    if config['ze_max_gap'] > 0:
-        config['ze_max_gap'] = None if np.isinf(config['ze_max_gap']) else config['ze_max_gap']
+    if config['cloud_max_gap'] > 0:
+        config['cloud_max_gap'] = None if np.isinf(config['cloud_max_gap']) else config['cloud_max_gap']
         mask_tmp_cloud= utils.fill_mask_gaps(mask_tmp_cloud,
                                               altitude=ds.range.data,
-                                              max_gap=config['ze_max_gap'],
+                                              max_gap=config['cloud_max_gap'],
                                               idxs_true=idxs_top)
 
-    if config['virga_max_gap'] > 0:
-        config['virga_max_gap'] = None if np.isinf(config['virga_max_gap']) else config['virga_max_gap']
+    if config['precip_max_gap'] > 0:
+        config['precip_max_gap'] = None if np.isinf(config['precip_max_gap']) else config['precip_max_gap']
         mask_tmp_virga = utils.fill_mask_gaps(mask_tmp_virga,
                                               altitude=ds.range.data,
-                                              max_gap=config['virga_max_gap'],
+                                              max_gap=config['precip_max_gap'],
                                               idxs_true=idxs_top)
 
     # identify the index of the lowest rang-gate in each cloud layer

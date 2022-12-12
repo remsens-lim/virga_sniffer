@@ -31,8 +31,8 @@ def vmask_interact(input_file,
                    clutter_c,
                    cbh_clean_thres,
                    cbh_layer_thres,
-                   ze_max_gap,
-                   virga_max_gap,
+                   cloud_max_gap,
+                   precip_max_gap,
                    cbh_fill_method,
                    cbh_fill_limit,
                    cbh_processing):
@@ -66,8 +66,8 @@ def vmask_interact(input_file,
                   cbh_processing=cbh_processing,
                   cbh_clean_thres=cbh_clean_thres/100.,
                   cbh_layer_thres=cbh_layer_thres,
-                  ze_max_gap=ze_max_gap,
-                  virga_max_gap=virga_max_gap,
+                  cloud_max_gap=cloud_max_gap,
+                  precip_max_gap=precip_max_gap,
                   cbh_fill_method=cbh_fill_method,
                   cbh_fill_limit=cbh_fill_limit)
     vsout = vm(input_data, config=config)
@@ -123,11 +123,11 @@ def vsinteractive():
     cbh_layer_thres = widgets.IntSlider(min=0, max=1000, step=100,
                                         value=default_config['cbh_layer_thres'],
                                         continuous_update=False)
-    ze_max_gap = widgets.IntSlider(min=0, max=500, step=50,
-                                      value=default_config['ze_max_gap'],
+    cloud_max_gap = widgets.IntSlider(min=0, max=500, step=50,
+                                      value=default_config['cloud_max_gap'],
                                       continuous_update=False)
-    virga_max_gap = widgets.IntSlider(min=0, max=2000, step=100,
-                                      value=default_config['virga_max_gap'],
+    precip_max_gap = widgets.IntSlider(min=0, max=2000, step=100,
+                                      value=default_config['precip_max_gap'],
                                       continuous_update=False)
     cbh_clean_thres = widgets.IntSlider(min=0, max=100, step=1,
                                         value=int(100*default_config['cbh_clean_thres']),
@@ -166,8 +166,8 @@ def vsinteractive():
         widgets.HBox([Label("Rain Mask (Ze) [dBz] :"),  ze_thres,mask_rain_ze]),#Label("No Virga if Ze of lowest range-gate is above threshold [dBz]")
         widgets.HBox([Label("Rain Mask (DWD)      :"), mask_rain]),#, Label("If DWD detects Rain => no virga")
         widgets.HBox([Label("Doppler Velocity Mask [ms-1]:"),vel_thres,mask_vel]),#Label("Virga, if Dopplervelocity below threshold [m s-1]"
-        widgets.HBox([Label("Virga max gap [m]"), virga_max_gap]),#Label("Requires this number of range-gates connected to CBH to be counted as virga."
-        widgets.HBox([Label("Ze max gap [m]:"), ze_max_gap]),
+        widgets.HBox([Label("Precip. max gap [m]"), precip_max_gap]),#Label("Requires this number of range-gates connected to CBH to be counted as virga."
+        widgets.HBox([Label("Cloud max gap [m]:"), cloud_max_gap]),
         widgets.HBox([Label("Number of RG required:"), minimum_rangegate_number]),#Label("Requires this number of virga range-gates to be counted as virga."
         widgets.HBox([Label("Masking Ze+Vel relation:"), clutter_m, clutter_c, mask_clutter]),
         Label("Data chooser: ----------------------------------------------------------"),
@@ -191,8 +191,8 @@ def vsinteractive():
                                           mask_clutter=mask_clutter,
                                           clutter_m=clutter_m,
                                           clutter_c=clutter_c,
-                                          ze_max_gap=ze_max_gap,
-                                          virga_max_gap=virga_max_gap,
+                                          cloud_max_gap=cloud_max_gap,
+                                          precip_max_gap=precip_max_gap,
                                           cbh_fill_method=cbh_fill_method,
                                           cbh_processing=cbh_processing,
                                           cbh_clean_thres=cbh_clean_thres,

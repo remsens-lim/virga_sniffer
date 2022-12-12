@@ -32,9 +32,9 @@ Flags are boolean values which control certain functionality of the Virga-Sniffe
 ## Thresholds
 Virga detection specific thresholds:
  - **minimum_rangegate_number = 2**: In case of non-continuous radar signal in a column, isolated contiguous range-gates with valid radar signal are used only if the number of range-gates is greater than this threshold.
- - **ze_max_gap = 150 m**: From each cloud-base layer, the detection of cloud advances upwards. Cloud-top heights are assigned below the first gap larger than **ze_max_gap**. The cloud mask is 
+ - **cloud_max_gap = 150 m**: From each cloud-base layer, the detection of cloud advances upwards. Cloud-top heights are assigned below the first gap larger than **cloud_max_gap**. The cloud mask is 
    always applied between cloud-base and detected cloud-top. The default value is 150m.
- - **virga_max_gap = 700 m**: From each cloud-base layer, the detection of virga advances downwards. Virga is detected until a gap (nan-value) of radar-reflectivity larger than **virga_max_gap** 
+ - **precip_max_gap = 700 m**: From each cloud-base layer, the detection of virga advances downwards. Virga is detected until a gap (nan-value) of radar-reflectivity larger than **precip_max_gap** 
    occurs. The default value is 700m to also capture virga in fall streaks relatively far below the cloud base, but mask out any clutter or not identified cloud close to the surface or lower cloud 
    layer.
  - **vel_thres = 0 ms-1**: Defines the mean Doppler velocity threshold. If **vel_mask** is set to **True** (default), a datapoint is considered virga only if the mean Doppler velocity is below this threshold. 
