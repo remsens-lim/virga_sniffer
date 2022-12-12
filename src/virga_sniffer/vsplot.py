@@ -369,7 +369,10 @@ class VirgaSnifferPlotAccessor:
             ax = plt.gca()
         if ylim is None:
             # limit altitude to next full km above max cloud top height
+            # fallback is cloud-base height, if no cloud top is detected in the scene
             ylim = np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3
+            if np.isnan(ylim):
+                ylim = np.ceil(np.nanmax(self._obj.cloud_base_height) * 1e-3) * 1e3
         if vmin is None:
             vmin = np.floor(0.1*np.nanmin(self._obj.Ze.values))*10
         if vmax is None:
@@ -457,7 +460,11 @@ class VirgaSnifferPlotAccessor:
             ax = plt.gca()
         if ylim is None:
             # limit altitude to next full km above max cloud top height
+            # fallback is cloud-base height, if no cloud top is detected in the scene
             ylim = np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3
+            if np.isnan(ylim):
+                ylim = np.ceil(np.nanmax(self._obj.cloud_base_height) * 1e-3) * 1e3
+                
         if vmin is None:
             vmin = np.floor(np.nanmin(self._obj.vel.values))
         if vmax is None:
@@ -545,8 +552,10 @@ class VirgaSnifferPlotAccessor:
             ax = plt.gca()
         if ylim is None:
             # limit altitude to next full km above max cloud top height
-            # add one km to make room for legends
-            ylim = (1. + np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3)) * 1e3
+            # fallback is cloud-base height, if no cloud top is detected in the scene
+            ylim = np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3
+            if np.isnan(ylim):
+                ylim = np.ceil(np.nanmax(self._obj.cloud_base_height) * 1e-3) * 1e3
 
         if plot_flags['ze']:
             self.plot_ze_mask(ax=ax)
@@ -564,15 +573,15 @@ class VirgaSnifferPlotAccessor:
             # radar_patch = mpatches.Patch(color="#7fc97f", label='radar signal')
             virga_patch = mpatches.Patch(color="#d95f02", label='virga mask')
             cloud_patch = mpatches.Patch(color="#7570b3", label='cloud mask')
-            radar_patch = mpatches.Patch(color="#bdbdbd", label='radar signal')
+            radar_patch = mpatches.Patch(color="#bdbdbd", label='unclassified')
             cloud_base_line = Line2D([0], [0], color='k', lw=2)
             cloud_layer_fill = Line2D([0], [0], color='k', lw=2, ls=':')
             cloud_top_line = Line2D([0], [0], color='k', lw=2, ls='--')
 
             ax.legend([cloud_base_line, cloud_top_line, cloud_layer_fill,
                        radar_patch, virga_patch, cloud_patch],
-                      ['cloud-base', 'cloud-top', 'filled cloud-base',
-                       'radar signal', 'virga mask', 'cloud mask'],
+                      ['cloud base', 'cloud top', 'filled cloud base',
+                       'unclassified', 'virga mask', 'cloud mask'],
                       fontsize=fontsize['legend'],
                       ncol=2)
         ax.set_ylim([0, ylim])
@@ -644,7 +653,10 @@ class VirgaSnifferPlotAccessor:
 
         if ylim is None:
             # limit altitude to next full km above max cloud top height
+            # fallback is cloud-base height, if no cloud top is detected in the scene
             ylim = np.ceil(np.nanmax(self._obj.cloud_top_height) * 1e-3) * 1e3
+            if np.isnan(ylim):
+                ylim = np.ceil(np.nanmax(self._obj.cloud_base_height) * 1e-3) * 1e3
 
         stime = pd.to_datetime(self._time.values[0])
         etime = pd.to_datetime(self._time.values[-1])
