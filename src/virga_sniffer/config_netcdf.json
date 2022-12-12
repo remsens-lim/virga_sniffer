@@ -15,6 +15,14 @@
     "long_name": "Cloud mask on radar coordinates, separated for each cloud layer",
     "note": "True if cloud is identified by selecting valid radar signal between cloud base and top."
   },
+  "mask_precip": {
+    "long_name": "Precipitation mask on radar coordinates.",
+    "note": "True if precipitation is identified."
+  },
+  "mask_precip_layer": {
+    "long_name": "Precipitation mask on radar coordinates, separated for each cloud layer.",
+    "note": "True if precipitation is identified."
+  },
   "flag_virga": {
     "long_name": "Flag virga at time-step.",
     "note": "True if virga is identified at a certain time-step."
@@ -23,13 +31,21 @@
     "long_name": "Flag cloud at time-step.",
     "note": "True if there is any cloud at a certain time-step."
   },
+  "flag_precip": {
+    "long_name": "Flag precipitation at time-step.",
+    "note": "True if there is any precipitation at a certain time-step."
+  },
   "flag_virga_layer": {
     "long_name": "Flag virga at time-step within a cloud layer.",
     "note": "True if virga is identified within a cloud layer at a certain time-step."
   },
   "flag_cloud_layer": {
-    "long_name": "Flag cloud at time-step within at cloud layer.",
+    "long_name": "Flag cloud at time-step within a cloud layer.",
     "note": "True if a cloud is identified at a certain cloud layer and time-step."
+  },
+  "flag_precip_layer": {
+    "long_name": "Flag precipitation at time-step within a cloud layer.",
+    "note": "True if precipitation is identified at a certain cloud layer and time-step."
   },
   "number_cloud_layers": {
     "long_name": "Number of layers containing clouds.",

@@ -41,8 +41,8 @@ can be disabled by either setting [cbh_fill_limit](cfg_thres) to 0 or [cbh_fill_
 After the preprocessing of CBH, the radar reflectivity values, specifically the boolean mask of valid reflectivity values, is used for the initial step of detecting precipitation, cloud and cloud-top 
 heights. This is done by successively iterating the reflectivity mask starting from each cloud-base up- and downwards. Precipitation is detected at each range-gate of valid radar reflectivity 
 iterating downward until a gap (nan-value in radar 
-reflectivity) occurs, which is larger than the configuration threshold [virga_max_gap](cfg_thres).
-Similarly, valid radar reflectivity values from the cloud base upward are marked as clouds until a gap larger than the configuration threshold [ze_max_gap](cfg_thres) occurs. The cloud top height 
+reflectivity) occurs, which is larger than the configuration threshold [precip_max_gap](cfg_thres).
+Similarly, valid radar reflectivity values from the cloud base upward are marked as clouds until a gap larger than the configuration threshold [cloud_max_gap](cfg_thres) occurs. The cloud top height 
 value is 
 assigned to the range gate value (top of range gate) of the last valid radar reflectivity value below the gap (see {ref}`example sketch <fig-sketch>`). 
 ```{note}
@@ -69,12 +69,12 @@ detection can be done using only cloud-base height and radar reflectivity data.
 ```
 
 Virga and cloud detection is sketched in the {ref}`figure below <fig-sketch>`. Special cases are:
- - **time = 2**: The gap (range-gate (rg) 7-8) is smaller than [virga_max_gap](cfg_thres) to count rg 6 as virga, but rg 6 is dropped due to [minimum_rangegate_number](cfg_thres)=2.
- - **time = 3**: The gap (rg 7-8) is smaller than [virga_max_gap](cfg_thres), therefore rg 3-6 are counted as virga.
- - **time = 4**: The gap (rg 7-11) is larger than [virga_max_gap](cfg_thres), therefore rg 3-6 are not counted as virga. In addition, the gap (rg 17-18) is larger than [ze_max_gap](cfg_thres), 
+ - **time = 2**: The gap (range-gate (rg) 7-8) is smaller than [precip_max_gap](cfg_thres) to count rg 6 as virga, but rg 6 is dropped due to [minimum_rangegate_number](cfg_thres)=2.
+ - **time = 3**: The gap (rg 7-8) is smaller than [precip_max_gap](cfg_thres), therefore rg 3-6 are counted as virga.
+ - **time = 4**: The gap (rg 7-11) is larger than [precip_max_gap](cfg_thres), therefore rg 3-6 are not counted as virga. In addition, the gap (rg 17-18) is larger than [cloud_max_gap](cfg_thres), 
    therefore rg 19 is not counted as cloud.
  - **time = 5**: Rain is observed at the surface (either by [mask_rain](cfg_flag) or [mask_rain_ze](cfg_flag)), therefore no virga is assigned in this column. 
- - **time = 6**: Same as **time = 5**. In addition, the gap (rg 17) is smaller than [ze_max_gap](cfg_thres), therefore rg 18-19 are counted as cloud.
+ - **time = 6**: Same as **time = 5**. In addition, the gap (rg 17) is smaller than [cloud_max_gap](cfg_thres), therefore rg 18-19 are counted as cloud.
 
 ```{figure} images/example_detection.png
 :name: fig-sketch

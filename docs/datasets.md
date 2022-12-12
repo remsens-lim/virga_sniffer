@@ -84,7 +84,14 @@ mask_virga = mask_virga.sum(axis=-1).astype(bool)
  - **units**: bool
  - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
 
-Similar to the virga masks, this masks are True if a clouds are detected on the radar data points.
+Similar to the virga masks, these masks are True if a clouds are detected on the radar data points.
+
+### Precipitation mask
+ - **name**: *mask_precip*, *mask_precip_layer*
+ - **units**: bool
+ - **dimensions**: (*time*, *range*), (*time*, *range*, *layer*)
+
+Similar to the virga masks, these masks are True if a precipitation is detected on the radar data points.
 
 ### Virga flag
  - **name**: *flag_virga*, *flag_virga_layer*
@@ -99,6 +106,13 @@ These flags are True if virga is detected in an entire column / within a cloud l
  - **dimensions**: (*time*), (*time*, *layer*)
 
 These flags are True if clouds are detected in an entire column / at a cloud layer at a certain time-step.
+
+### Precipitation flag
+ - **name**: *flag_precip*, *flag_precip_layer*
+ - **units**: bool
+ - **dimensions**: (*time*), (*time*, *layer*)
+
+These flags are True if precipitation is detected in an entire column / at a cloud layer at a certain time-step.
 
 ### Number of cloud layers
  - **name**: *number_cloud_layers*
@@ -117,7 +131,7 @@ number_cloud_layers = np.count_nonzero(flag_cloud_layer, axis=1)
  - **dimensions**: (*time*, *layer*)
 
 *virga_depth* and *virga_depth_maximum_extent* are measures of the vertical extend of the virga, but calculated differently. *virga_depth* denotes the sum of the vertical extend of all range-gates 
-where virga is detected, thus excluding gaps introduced by [virga_max_gap](cfg_thres). *virga_depth_maximum_extent* includes these gaps, by being calculated by ```virga_top_height - virga_base_height```. Therefore, *virga_depth* should be used, when calculating volumetric characteristics, such as the liquid water path, and *virga_depth_maximum_extent* for geometric characteristics.
+where virga is detected, thus excluding gaps introduced by [precip_max_gap](cfg_thres). *virga_depth_maximum_extent* includes these gaps, by being calculated by ```virga_top_height - virga_base_height```. Therefore, *virga_depth* should be used, when calculating volumetric characteristics, such as the liquid water path, and *virga_depth_maximum_extent* for geometric characteristics.
 
 ### Cloud depth
  - **name**: *cloud_depth*
@@ -163,6 +177,8 @@ method (*flag_cbh_interpolated*).
 The output dataset is enhanced with 
 [xarray.Datast accessors](https://docs.xarray.dev/en/stable/generated/xarray.register_dataset_accessor.html)
 to add plotting capability (see [vsplot](vsplot)).
+
+Parts of the quicklooks in vsplot make use of the colormaps in the [CMasher](https://ui.adsabs.harvard.edu/link_gateway/2020JOSS....5.2004V) package.
 
 The methods can be accessed with:
 ```{code-block} python
