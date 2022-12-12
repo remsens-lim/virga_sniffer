@@ -70,6 +70,16 @@ def process_cbh(input_data: xr.Dataset,
 
 
     cbh = input_data.cloud_base_height
+    
+    # drop outlier 
+    cbhdiff = np.abs(np.diff(cbh.values,axis=0))
+    mask = cbhdiff>config['cbh_layer_thres']
+    mask = np.vstack((np.full(cbh.layer.size,False),
+                      mask[:-1,:]*mask[1:,:],
+                      mask[-1,:]))
+    cbh.values[mask] = np.nan
+    
+    # initital smoothing
     cbh = smooth(cbh, window=config['cbh_smooth_window'])
 
     # prepare lifting condensation level data if required
