@@ -193,7 +193,9 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     gapidx_cloud = utils.get_gapidx(mask_tmp_cloud)
     gapidx_virga = utils.get_gapidx(mask_tmp_virga)
 
-    firstgap_cloud = utils.get_firstgap_up(gapidx_cloud, ilow)
+    firstgap_cloud = utils.get_firstgap_up(gapidx=gapidx_cloud,
+                                           idxs=idxs_top[:,1:],
+                                           layer_constraint=config['cbh_connect2top'])
     firstgap_virga = utils.get_firstgap_dn(gapidx_virga, ilow)
 
     # assign cloud top heights
@@ -205,6 +207,8 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
 
     # remove cbh values if connected 
     cbh = cbh.where(~np.isnan(cth.values))
+    cth = cth.where(~np.isnan(cbh.values))
+    
 
     # Find index of layer data for range-gate data
     idxs_cbh = np.searchsorted(rgtop, cbh.values[:, :])  # find index of cbh layers in vmask
@@ -214,6 +218,8 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
 
     # remove cloud top height value if there is no cloud
     cth = cth.where(idxs_cth != idxs_cbh)
+    cth = cth.where(~np.isnan(cbh.values))
+    
 
     # remove virga below gaps
     dummy = np.ones(ds.time.size)[:,np.newaxis]

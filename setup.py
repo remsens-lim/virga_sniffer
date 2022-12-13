@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name="virga_sniffer",
-    version="0.3.4",
+    version="1.0.0",
     description="Cloud and Virga detection based on radar reflectivity and ceilometer cloud base height.",
     url="https://github.com/remsens-lim/virga_sniffer.git",
     license="GPL-3.0",

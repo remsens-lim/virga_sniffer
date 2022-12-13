@@ -26,7 +26,7 @@ copyright = '2022, Jonas Witthuhn, Johannes Röttenbacher, Heike Kalesse-Los'
 author = 'Jonas Witthuhn, Johannes Röttenbacher, Heike Kalesse-Los'
 
 # The full version, including alpha/beta/rc tags
-release = 'v0.3.4'
+release = 'v1.0.0'
 
 
 # -- General configuration ---------------------------------------------------

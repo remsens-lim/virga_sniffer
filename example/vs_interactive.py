@@ -31,6 +31,7 @@ def vmask_interact(input_file,
                    clutter_c,
                    cbh_clean_thres,
                    cbh_layer_thres,
+                   cbh_connect2top,
                    cloud_max_gap,
                    precip_max_gap,
                    cbh_fill_method,
@@ -66,6 +67,7 @@ def vmask_interact(input_file,
                   cbh_processing=cbh_processing,
                   cbh_clean_thres=cbh_clean_thres/100.,
                   cbh_layer_thres=cbh_layer_thres,
+                  cbh_connect2top=cbh_connect2top,
                   cloud_max_gap=cloud_max_gap,
                   precip_max_gap=precip_max_gap,
                   cbh_fill_method=cbh_fill_method,
@@ -123,6 +125,7 @@ def vsinteractive():
     cbh_layer_thres = widgets.IntSlider(min=0, max=1000, step=100,
                                         value=default_config['cbh_layer_thres'],
                                         continuous_update=False)
+    cbh_connect2top = widgets.Checkbox(value=default_config['cbh_connect2top'], indent=False)
     cloud_max_gap = widgets.IntSlider(min=0, max=500, step=50,
                                       value=default_config['cloud_max_gap'],
                                       continuous_update=False)
@@ -155,7 +158,7 @@ def vsinteractive():
         Label("CBH Processing: -------------------------------------------------------"),
         widgets.HBox([Label("CBH smooth window [s]:"),cbh_smooth_window]),
         widgets.HBox([Label("CBH layer threshold [m]:"),cbh_layer_thres]),
-        widgets.HBox([Label("CBH layer clean threshold [%]:"),cbh_clean_thres]),
+        widgets.HBox([Label("CBH layer clean threshold [%]:"),cbh_clean_thres, "Connect to top:",cbh_connect2top]),
         widgets.HBox([widgets.VBox([Label("CBH Layer processing:"),Label("0-clean, 1-split, 2-merge, 3-LCL, 4-smooth (default  == 1,0,2,0,3,1,0,2,0,3,4)")]),
                       cbh_processing]),
         widgets.HBox([Label("Layer max filling [min]:"),cbh_fill_method,cbh_fill_limit]),
@@ -197,6 +200,7 @@ def vsinteractive():
                                           cbh_processing=cbh_processing,
                                           cbh_clean_thres=cbh_clean_thres,
                                           cbh_layer_thres=cbh_layer_thres,
+                                          cbh_connect2top=cbh_connect2top,
                                           cbh_fill_limit=cbh_fill_limit))
     return ui, out
 

@@ -6,6 +6,7 @@
 * Initial detection of precipitation and clouds has been optimized to also handle large values of *virga_max_gap* and *ze_max_gap* correctly.
 * **configuration:**
   * A new flag has been added to the configuration: *lcl_replace_cbh* (default=True) to change the handling of LCL data in *layer_utils.process_cbh*. If the configuration contains *3* in *cbh_process*. If True, per default, the LCL replaces the lowermost CBH layer. If False, the LCL values are merged to the lowermost CBH to replace only nan values.
+  * new flag *cbh_connect2top*: If True, the CBH assigned to connecting precipitation events will be the upper most CBH, if False, the lower most. The default is False. 
   * rename *ze_max_gap* to *cloud_max_gap*
   * rename *virga_max_gap* to *precip_max_gap*
 * **virga_detection:**
