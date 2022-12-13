@@ -32,6 +32,7 @@ To run the config demonstration in the examples directory, additional dependenci
 
 # Versions
 Documentation of version changes can be found in [ChangeLog.md](ChangeLog.md).
+- **v1.0.X**: Additional user configuration, optimized initial detection. Version referenced in https://doi.org/10.5194/amt-2022-252
 - **v0.3.X**: Virga-Sniffer overhaul, generalized input data, multi-layer handling
 - **v0.2.X**: improved base version, using heave corrected data
 - **v0.1.X**: base version tailored to limrad94 Reflectivity, 1st ceilometer CBH, DWD rain sensor
