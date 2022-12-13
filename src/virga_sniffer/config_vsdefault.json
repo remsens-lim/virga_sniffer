@@ -15,6 +15,7 @@
     "lcl_replace_cbh": true,
     "lcl_smooth_window": 300,
     "cbh_layer_thres": 500,
+    "cbh_connect2top": false,
     "cbh_clean_thres": 0.05,
     "cbh_fill_method": "slinear",
     "cbh_fill_limit": 60,

@@ -72,28 +72,26 @@ def get_firstgap_dn(gapidx, idxs):
 
     return firstgap_dn
 
-def get_firstgap_up(gapidx, idxs, fill_value=None):
+def get_firstgap_up(gapidx, idxs, layer_constraint=True):
     """ Get the closest gap idx above idx """
-    if fill_value is None:
-        fill_value = -1
     
     Nshape = gapidx.shape
     itim = np.arange(Nshape[0])
-    firstgap_up = np.full(idxs.shape, fill_value)
-    ifirstgaptmp = np.full(Nshape[0],-1)
+    firstgap_up = np.full(idxs.shape, -1)
     for ilayer in range(idxs.shape[1]):
         # find closest index of a gap above a CBH index (idxs) 
         ifirstgap = (gapidx.T<=idxs[:,ilayer]).sum(axis=0)
         ifirstgap[ifirstgap>=Nshape[1]] = Nshape[1]-1
         
         # selection, handling layer overlapp
-        tsel = np.ones(Nshape[0]).astype(bool)
-        # only assign if within a layer
-        if ilayer != idxs.shape[1]-1: # not last layer
-            tsel = ifirstgap <= idxs[:,ilayer+1]
-        # not assign, if already in the lower layer
-        tsel[ifirstgap==ifirstgaptmp] = False
-        ifirstgaptmp = ifirstgap
+        tsel = np.full(Nshape[0], True)
+        if layer_constraint and (ilayer!=idxs.shape[1]-1):
+            # assign only if within layer
+            isel = idxs[:,ilayer]<idxs[:,ilayer+1]
+            tsel[isel] *= (gapidx[isel,ifirstgap[isel]] <= idxs[isel,ilayer+1])
+        if ilayer!=0:
+            # avoid double values
+            tsel *= (gapidx[itim,ifirstgap]-1 != firstgap_up[tsel,ilayer-1])
             
         firstgap_up[tsel,ilayer] = gapidx[itim[tsel],ifirstgap[tsel]] -1
     return firstgap_up
