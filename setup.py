@@ -8,7 +8,7 @@ setup(
     author="Jonas Witthuhn",
     author_email="remsensarctic@uni-leipzig.de",
     #packages=["virga_sniffer"],
-    packages=find_namespace_packages(where='src/', include=['virga_sniffer.cmap'])
+    packages=find_namespace_packages(where='src/', include=['virga_sniffer.cmap']),
     package_dir={"": "src"},
     package_data={"": ["*.json"]},
     include_package_data=True,
