@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools", "wheel", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "virga_sniffer"
+dynamic = ["version"]
+description = "Cloud and Virga detection based on radar reflectivity and ceilometer cloud base height."
+authors = [
+    {name = "Jonas Witthuhn", email = "remsensarctic@uni-leipzig.de"}
+]
+license = {text = "GNU General Public License v3 (GPLv3)"}
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "xarray",
+    "netcdf4",
+    "pandas",
+    "bottleneck",
+    "scipy",
+    "matplotlib",          
+]
+
+[project.optional-dependencies]
+example = [
+    "jupyter",
+    "jupyterlab",
+    "ipywidgets",
+    "ipympl",
+]
+docs = [
+    "sphinx",
+    "myst-parser",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["virga_sniffer", "virga_sniffer.cmap"]
+
+[tool.setuptools.package-data]
+virga_sniffer = ["*.json"]
+
+[tool.setuptools_scm]
+local_scheme = "dirty-tag"
+write_to = "src/virga_sniffer/_version.py"
