@@ -48,7 +48,7 @@ extensions = [
 ]
 
 extlinks = {
-    "doi": ("https://doi.org/%s", "doi:"),
+    "doi": ("https://doi.org/%s", "doi:%s"),
 }
 
 graphviz_output_format = "svg"
