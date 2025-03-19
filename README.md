@@ -17,17 +17,17 @@ The example/virga-sniffer_config_demo.ipynb can be executet in
 # Installation
 The package can be installed via pip:
 ```
- python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer
+ python -m pip install git+https://github.com/remsens-lim/virga_sniffer
 ```
 
 To build the documentation, additional dependencies can be installed via:
 ```
- python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer[docs]
+ python -m pip install "virga_sniffer[docs] @ git+https://github.com/remsens-lim/virga_sniffer"
 ```
 
 To run the config demonstration in the examples directory, additional dependencies can be installed via:
 ```
- python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer[example]
+ python -m pip install "virga_sniffer[example] @ git+https://github.com/remsens-lim/virga_sniffer"
 ```
 
 # Versions

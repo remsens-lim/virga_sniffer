@@ -3,7 +3,7 @@
 
 The Virga-Sniffer can be installed via pip and the GitHub repository:
 ```
-python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer
+python -m pip install git+https://github.com/remsens-lim/virga_sniffer
 ```
 The following packages will be installed: 
  - virga_sniffer
@@ -94,7 +94,7 @@ To view the interactive demonstration of the Virga-Sniffer configuration, the ex
 
 To run the example jupyter notebook yourself, additional dependencies can be installed via:
 ```
-python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer[example]
+python -m pip install "virga_sniffer[example] @ git+https://github.com/remsens-lim/virga_sniffer"
 ```
 This will install additionally:
  - jupyter
@@ -121,7 +121,7 @@ The result will be shown as a [full quicklook](vsplot).
 ## Building the docs
 To build the docs, additional dependencies can be installed via:
 ```
-python -m pip install git+https://github.com/remsens-lim/virga_sniffer.git#egg=virga_sniffer[docs]
+ python -m pip install "virga_sniffer[docs] @ git+https://github.com/remsens-lim/virga_sniffer"
 ```
 
 Then, the docs can be build with 
