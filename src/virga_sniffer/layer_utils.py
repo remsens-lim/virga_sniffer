@@ -90,7 +90,7 @@ def process_cbh(input_data: xr.Dataset,
         lcl = smooth(lcl, window=config['lcl_smooth_window'])
 
     # CBH Layer identification, splitting and merging, filling
-    for cbhpro in config['cbh_processing']:  # [1,0,2,0,3,1,0,2,0,3,4]
+    for cbhpro in config['cbh_processing']:  # [1,0,2,0,1,0,2,0,4]
         if cbhpro == 0:
             # clean data
             cbh = clean(cbh, clean_threshold=config['cbh_clean_thres'])
