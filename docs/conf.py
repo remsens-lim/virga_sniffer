@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import virga_sniffer
 sys.path.insert(0, os.path.abspath('../src/'))
 sys.path.insert(0, os.path.abspath('../'))
 # sys.path.insert(0, os.path.abspath('../example/'))
@@ -26,7 +27,7 @@ copyright = '2022, Jonas Witthuhn, Johannes Röttenbacher, Heike Kalesse-Los'
 author = 'Jonas Witthuhn, Johannes Röttenbacher, Heike Kalesse-Los'
 
 # The full version, including alpha/beta/rc tags
-release = 'v1.0.0'
+release = virga_sniffer.__version__
 
 
 # -- General configuration ---------------------------------------------------
