@@ -36,7 +36,7 @@ from . import vsplot
 #     cbh_layer_fill=True,  # fill gaps of cbh layer?
 #     cbh_fill_method='slinear',  # fill method of cbh layer gaps
 #     layer_fill_limit=60,  # [s] fill gaps of cbh layer with this gap limit
-#     cbh_ident_function=[1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4])  # order of operations applied to cbh: 0-clean, 1-split, 2-merge, 3-add-LCL, 4-smooth
+#     cbh_ident_function=[1, 0, 2, 0, 1, 0, 2, 0, 4])  # order of operations applied to cbh: 0-clean, 1-split, 2-merge, 3-add-LCL, 4-smooth
 
 
 def check_input_config(input_data: xr.Dataset, config: dict, default_config: dict) -> None:
@@ -72,7 +72,7 @@ def check_input_config(input_data: xr.Dataset, config: dict, default_config: dic
         warnings.warn(f"Key in user configuration is not used: {key}.")
 
 
-def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
+def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr.Dataset:
     """
     This function identifies virga from input data of radar reflectivity, ceilometer cloud-base height and
     optionally doppler velocity, lifting condensation level and surface rain-sensor--rain-flag.
@@ -99,6 +99,8 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
     config: dict, optional
         The configuration flags and thresholds.
         Will be merged with the default configuration, see :ref:`config.md#configuration`.
+    verbose: bool, optional
+        If True print merged config and other infos from virga mask processing. The default ist False.
 
     Returns
     -------
@@ -123,6 +125,10 @@ def virga_mask(input_data: xr.Dataset, config: dict = None) -> xr.Dataset:
         config = default_config.copy()
     else:
         config = {**default_config, **config}
+
+    if verbose:
+        print("Config used:")
+        print(json.dumps(config,indent=4))
 
     # unify coordinates naming in input
     input_coords = list(input_data.Ze.coords.keys())[:2]

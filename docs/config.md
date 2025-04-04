@@ -63,7 +63,7 @@ Apart from thresholds, the cloud-base preprocessing is controlled by specialized
    - [bfill](https://docs.xarray.dev/en/stable/generated/xarray.DataArray.bfill.html)
    - *nearest*, *zero*, *slinear*, *quadratic*, *cubic*, *polynomial* as accepted by
      [xarray.interpolate_na](https://docs.xarray.dev/en/stable/generated/xarray.DataArray.interpolate_na.html)
- - **cbh_processing = [1, 0, 2, 0, 3, 1, 0, 2, 0, 3, 4]**: This list defines the methods applied for [preprocessing](preprocessing). 
+ - **cbh_processing = [1, 0, 2, 0, 1, 0, 2, 0, 4]**: This list defines the methods applied for [preprocessing](preprocessing). 
 
 ## Demonstration
 An interactive demonstration of the Virga-Sniffer configuration is available as a jupyter notebook (check *examples* directory, see [Setup/Configuration-Demonstration](cfg-demo)).
