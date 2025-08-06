@@ -69,7 +69,9 @@ def process_cbh(input_data: xr.Dataset,
         config = {**default_config, **config}
 
 
-    cbh = input_data.cloud_base_height
+    cbh = input_data.cloud_base_height.astype(float) # ensure float
+    cbh[cbh<0] = np.nan # negative values are not physical
+
     
     # drop outlier 
     cbhdiff = np.abs(np.diff(cbh.values,axis=0))

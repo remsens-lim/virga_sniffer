@@ -143,7 +143,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
 
     # calculate top and base of each range-gate
     # this will be used to identify the range-gate index of CBH, CTH in radar data
-    rgmid = ds.range.values
+    rgmid = ds.range.values.astype(float)
     rgedge = np.pad(np.diff(rgmid) / 2, pad_width=1, mode='edge')
     rgtop = rgmid + rgedge[1:]
     rgbase = rgmid - rgedge[:-1]
