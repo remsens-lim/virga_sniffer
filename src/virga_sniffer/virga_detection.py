@@ -22,6 +22,7 @@ from . import vsplot
 #     require_cbh=True,  # need a cloud base to be considered as virga?
 #     mask_rain=True,  # apply rain mask from ancillary data?
 #     mask_rain_ze=True,  # apply rain mask from radar signal?
+#.    vmask_ze_range=(-25,None) # radar reflectivity range considered for virga and precip masks, None => no limit
 #     ze_thres=0,  # [dBz] minimum Radar signal at lowest range-gate which is considered rain
 #     ignore_virga_gaps=True,  # ignore gaps in virga when masking, if False, no virga after first gap (top-down)
 #     minimum_rangegate_number=2,  # minimum number of range-gates in column to be considered virga
@@ -156,6 +157,13 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
     # initialize masks if with valid radar signal
     vmask = ~np.isnan(ds.Ze.values)  # flag_virga (True if Virga)
     cmask = vmask.copy()  # flag_cloud (True if cloud)
+    # add valid Ze range for virga masks
+    if "vmask_ze_range" in config:
+        if config["vmask_ze_range"][0] is not None:
+            vmask *= ds.Ze.values >= config["vmask_ze_range"][0]
+        if config["vmask_ze_range"][1] is not None:
+            vmask *= ds.Ze.values < config["vmask_ze_range"][1]
+
 
     # --------------------------------------
     # Apply  Virga-Sniffer on total profiles
