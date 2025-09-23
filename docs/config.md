@@ -34,7 +34,7 @@ Flags are boolean values which control certain functionality of the Virga-Sniffe
 (cfg_thres)=
 ## Thresholds
 Virga detection specific thresholds:
- - **vmask_ze_range = (-25,null)**: Limit virga and precipitation masks to this specific range of radar reflectivity values (vmask = **vmask_ze_range[0]** <= Ze < **vmask_ze_range[1]**). "null" or "None" means no limit.
+ - **vmask_ze_range = (null,null)**: Limit virga and precipitation masks to this specific range of radar reflectivity values (vmask = **vmask_ze_range[0]** <= Ze < **vmask_ze_range[1]**). "null" or "None" means no limit.
  - **minimum_rangegate_number = 2**: In case of non-continuous radar signal in a column, isolated contiguous range-gates with valid radar signal are used only if the number of range-gates is greater than this threshold.
  - **cloud_max_gap = 150 m**: From each cloud-base layer, the detection of cloud advances upwards. Cloud-top heights are assigned below the first gap larger than **cloud_max_gap**. The cloud mask is 
    always applied between cloud-base and detected cloud-top. The default value is 150m.

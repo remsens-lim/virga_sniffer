@@ -181,7 +181,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
     idxs_top[idxs_top == -1] = vmask.shape[1] - 1
 
     # initialize temporal array
-    mask_tmp_cloud = vmask.copy()
+    mask_tmp_cloud = cmask.copy()
     mask_tmp_virga = vmask.copy()
 
     if config['cloud_max_gap'] > 0:

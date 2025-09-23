@@ -4,7 +4,7 @@
     "mask_clutter": true,
     "mask_rain": true,
     "mask_rain_ze": true,
-    "vmask_ze_range": [-25,null],
+    "vmask_ze_range": [null,null],
     "minimum_rangegate_number": 2,
     "cloud_max_gap": 150,
     "precip_max_gap": 700,
