@@ -321,7 +321,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
             # Check if Signal of first range gate is below threshold.
             # e.g., if larger Signal, than this virga is considered rain
             # Apply only to lowest range-gate
-            ze_threshold = ds.Ze.values[:, 0] < np.array(ze_thres)[ds.ze_thres_index.values.astype(int)]
+            ze_threshold = ds.Ze.values[:, 0] < np.array(config['ze_thres'])[ds.ze_thres_index.values.astype(int)]
             ze_threshold += np.isnan(ds.Ze.values[:, 0])  # add nans again
             ze_threshold += ~vmask[:, 0] # only apply rainmask if there is actually precip until the lowest rg
             vmask_layer[:, :, 0] *= _expand_mask(ze_threshold, vmask.shape[1])
