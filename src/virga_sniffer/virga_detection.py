@@ -357,7 +357,12 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
         output_rainflag_surface += ds.flag_surface_rain.values
     output_rainflag_lowestrg = np.full(ds.Ze.time.size,False)
     if config['mask_rain_ze']:
-        output_rainflag_lowestrg += ds.Ze.values[:, 0]>config['ze_thres']
+        if isinstance(config['ze_thres'], Iterable) and (len(config['ze_thres'])>1):
+            output_rainflag_lowestrg += ds.Ze.values[:, 0] < np.array(config['ze_thres'])[ds.ze_thres_index.values.astype(int)]
+        else:
+            if isinstance(config['ze_thres'], Iterable):
+                ze_thres = config['ze_thres'][0]
+            output_rainflag_lowestrg += ds.Ze.values[:, 0]>ze_thres
     virga_depth_rgmid = np.full(cbh.shape, np.nan)
     virga_depth_rgedge = np.full(cbh.shape, np.nan)
     virga_depth_nogap = np.full(cbh.shape, np.nan)
