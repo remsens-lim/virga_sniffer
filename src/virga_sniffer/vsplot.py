@@ -208,6 +208,23 @@ class VirgaSnifferPlotAccessor:
                     colors=[color],
                     alpha=1)
         return ax
+    
+    def plot_surface_precip(self,
+                            ax=None,
+                            color="#1dabed"):
+        if ax is None:
+            ax = plt.gca()
+
+        plt_pmask = self._obj.mask_precip_layer.values[:,:,0].astype(float)
+        plt_pmask[plt_pmask == 0] = np.nan
+        ax.contourf(self._time,
+                self._obj.range,
+                plt_pmask.T,
+                levels=1,
+                colors=[color],
+                alpha=1)
+
+        return ax
 
     def plot_cloud_mask(self,
                         ax=None,
@@ -520,7 +537,7 @@ class VirgaSnifferPlotAccessor:
              Configuration of fontsizes. Keywords and Defaults: "legend"=16, "ax_label"=16, "ax_ticklabel"=14,
              "cbar_label"=16, "cbar_ticklabel"=14
          plot_flags: dict, optional
-             Components to plot. Keywords and Defaults: "ze"=True, "virga"=True, "cloud"=True, "rainflag"=True
+             Components to plot. Keywords and Defaults: "ze"=True, "virga"=True, "cloud"=True, "rainflag"=True, "surface_precip"=True
 
          Returns
          -------
@@ -532,6 +549,7 @@ class VirgaSnifferPlotAccessor:
             virga=True,
             cloud=True,
             rainflag=True,
+            surface_precip=True
         )
         fontsize_default = dict(
             legend=16,
@@ -559,6 +577,8 @@ class VirgaSnifferPlotAccessor:
 
         if plot_flags['ze']:
             self.plot_ze_mask(ax=ax)
+        if plot_flags['surface_precip']:
+            self.plot_surface_precip(ax=ax)
         if plot_flags['virga']:
             self.plot_virga_mask(ax=ax)
         if plot_flags['cloud']:
@@ -572,16 +592,18 @@ class VirgaSnifferPlotAccessor:
             # cloud_patch = mpatches.Patch(color="#a6cee3", label='cloud mask')
             # radar_patch = mpatches.Patch(color="#7fc97f", label='radar signal')
             virga_patch = mpatches.Patch(color="#d95f02", label='virga mask')
+            sprecip_patch = mpatches.Patch(color="#1dabed", label='precip mask')
             cloud_patch = mpatches.Patch(color="#7570b3", label='cloud mask')
             radar_patch = mpatches.Patch(color="#bdbdbd", label='unclassified')
+            empty_patch = mpatches.Patch(color="#ffffff00", label='empty')
             cloud_base_line = Line2D([0], [0], color='k', lw=2)
             cloud_layer_fill = Line2D([0], [0], color='k', lw=2, ls=':')
             cloud_top_line = Line2D([0], [0], color='k', lw=2, ls='--')
 
-            ax.legend([cloud_base_line, cloud_top_line, cloud_layer_fill,
-                       radar_patch, virga_patch, cloud_patch],
-                      ['cloud base', 'cloud top', 'filled cloud base',
-                       'unclassified', 'virga mask', 'cloud mask'],
+            ax.legend([cloud_base_line, cloud_top_line, cloud_layer_fill,empty_patch,
+                       radar_patch, virga_patch, sprecip_patch, cloud_patch],
+                      ['cloud base', 'cloud top', 'filled cloud base','',
+                       'unclassified', 'virga mask', 'precip mask', 'cloud mask'],
                       fontsize=fontsize['legend'],
                       ncol=2)
         ax.set_ylim([0, ylim])
@@ -630,6 +652,7 @@ class VirgaSnifferPlotAccessor:
             virga=True,
             cloud=True,
             rainflag=True,
+            surface_precip=True,
         )
         fontsize_default = dict(
             title=18,
