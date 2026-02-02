@@ -331,6 +331,8 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
         else: # ze_thres is Real number or iterable of length 1:
             if isinstance(config['ze_thres'], Iterable):
                 ze_thres = config['ze_thres'][0]
+            else:
+                ze_thres = config['ze_thres']
             # Check if Signal of first range gate is below threshold.
             # e.g., if larger Signal, than this virga is considered rain
             # Apply only to lowest range-gate
@@ -362,6 +364,8 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
         else:
             if isinstance(config['ze_thres'], Iterable):
                 ze_thres = config['ze_thres'][0]
+            else:
+                ze_thres = config['ze_thres']
             output_rainflag_lowestrg += ds.Ze.values[:, 0]>ze_thres
     virga_depth_rgmid = np.full(cbh.shape, np.nan)
     virga_depth_rgedge = np.full(cbh.shape, np.nan)
