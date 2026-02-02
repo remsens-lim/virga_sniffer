@@ -9,6 +9,7 @@ import xarray as xr
 import numpy as np
 import json
 import warnings
+from collections.abc import Iterable
 
 
 from . import layer_utils
@@ -66,6 +67,9 @@ def check_input_config(input_data: xr.Dataset, config: dict, default_config: dic
         raise Exception("config['mask_vel']==True while input['vel'] is missing.")
     if config['mask_clutter'] and ("vel" not in input_vars):
         raise Exception("config['mask_clutter']==True while input['vel'] is missing.")
+    if isinstance(config['ze_thres'], Iterable) and (len(config['ze_thres'])>1):
+        if "ze_thres_index" not in input_vars:
+            raise Exception("input missing 'ze_thres_index' variable, but is required as len(config['ze_thres'])>1.")
         
     # Warn if keys are in the user config are not used - possible typos...
     keys_not_used = config.keys() - default_config.keys()
@@ -90,6 +94,7 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
         * **vel**: ('time', 'range') [optional] - radar doppler velocity [ms-1]
         * **lcl**: ('time') [optional] - lifting condensation level [m]
         * **flag_surface_rain**: ('time') [optional] - flags if rain at the surface [bool]
+        * **ze_thres_index**: ('time') [optional] - index of ze_thres (from config) for each time step, only required if len(ze_thres)>1 [int]
 
         Coords:
 
@@ -312,16 +317,32 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
             vmask_layer[:, :, ilayer] *= _expand_mask(~layerrainmask, vmask.shape[1])  # True if no rain at sfc
 
     if config['mask_rain_ze']:
-        # Check if Signal of first range gate is below threshold.
-        # e.g., if larger Signal, than this virga is considered rain
-        # Apply only to lowest range-gate
-        ze_threshold = ds.Ze.values[:, 0] < config['ze_thres']
-        ze_threshold += np.isnan(ds.Ze.values[:, 0])  # add nans again
-        ze_threshold += ~vmask[:, 0] # only apply rainmask if there is actually precip until the lowest rg
-        vmask_layer[:, :, 0] *= _expand_mask(ze_threshold, vmask.shape[1])
-        for ilayer in range(1,cbh.shape[1]):
-            layerrainmask = (~ze_threshold)*(idxs_cbh[:,ilayer-1] == -1)
-            vmask_layer[:, :, ilayer] *= _expand_mask(~layerrainmask, vmask.shape[1])  # True if no rain at sfc
+        if isinstance(config['ze_thres'], Iterable) and (len(config['ze_thres'])>1):
+            # Check if Signal of first range gate is below threshold.
+            # e.g., if larger Signal, than this virga is considered rain
+            # Apply only to lowest range-gate
+            ze_threshold = ds.Ze.values[:, 0] < np.array(config['ze_thres'])[ds.ze_thres_index.values.astype(int)]
+            ze_threshold += np.isnan(ds.Ze.values[:, 0])  # add nans again
+            ze_threshold += ~vmask[:, 0] # only apply rainmask if there is actually precip until the lowest rg
+            vmask_layer[:, :, 0] *= _expand_mask(ze_threshold, vmask.shape[1])
+            for ilayer in range(1,cbh.shape[1]):
+                layerrainmask = (~ze_threshold)*(idxs_cbh[:,ilayer-1] == -1)
+                vmask_layer[:, :, ilayer] *= _expand_mask(~layerrainmask, vmask.shape[1])  # True if no rain at sfc
+        else: # ze_thres is Real number or iterable of length 1:
+            if isinstance(config['ze_thres'], Iterable):
+                ze_thres = config['ze_thres'][0]
+            else:
+                ze_thres = config['ze_thres']
+            # Check if Signal of first range gate is below threshold.
+            # e.g., if larger Signal, than this virga is considered rain
+            # Apply only to lowest range-gate
+            ze_threshold = ds.Ze.values[:, 0] < ze_thres
+            ze_threshold += np.isnan(ds.Ze.values[:, 0])  # add nans again
+            ze_threshold += ~vmask[:, 0] # only apply rainmask if there is actually precip until the lowest rg
+            vmask_layer[:, :, 0] *= _expand_mask(ze_threshold, vmask.shape[1])
+            for ilayer in range(1,cbh.shape[1]):
+                layerrainmask = (~ze_threshold)*(idxs_cbh[:,ilayer-1] == -1)
+                vmask_layer[:, :, ilayer] *= _expand_mask(~layerrainmask, vmask.shape[1])  # True if no rain at sfc
 
     
     
@@ -338,7 +359,14 @@ def virga_mask(input_data: xr.Dataset, config: dict = None, verbose=False) -> xr
         output_rainflag_surface += ds.flag_surface_rain.values
     output_rainflag_lowestrg = np.full(ds.Ze.time.size,False)
     if config['mask_rain_ze']:
-        output_rainflag_lowestrg += ds.Ze.values[:, 0]>config['ze_thres']
+        if isinstance(config['ze_thres'], Iterable) and (len(config['ze_thres'])>1):
+            output_rainflag_lowestrg += ds.Ze.values[:, 0] > np.array(config['ze_thres'])[ds.ze_thres_index.values.astype(int)]
+        else:
+            if isinstance(config['ze_thres'], Iterable):
+                ze_thres = config['ze_thres'][0]
+            else:
+                ze_thres = config['ze_thres']
+            output_rainflag_lowestrg += ds.Ze.values[:, 0]>ze_thres
     virga_depth_rgmid = np.full(cbh.shape, np.nan)
     virga_depth_rgedge = np.full(cbh.shape, np.nan)
     virga_depth_nogap = np.full(cbh.shape, np.nan)
